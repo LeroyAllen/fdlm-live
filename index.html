@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <title>FDLM Live</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#190c0d" />
+
+  <!-- PWA / Zum Home-Bildschirm -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FDLM Live" />
+
+  <!-- Leaflet (Karte) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Supabase (Live-Sync via Realtime) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg: #190c0d;
+      --accent: #c34254;
+      --text: #fff;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; background: #190c0d; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    #map { position: fixed; inset: 0; height: 100%; background: #e8e6e1; z-index: 0; }
+
+    /* Top bar */
+    #topbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; gap: 10px;
+      padding: calc(12px + env(safe-area-inset-top)) 14px 12px;
+      background: linear-gradient(180deg, rgba(25,12,13,.92), rgba(25,12,13,0));
+      color: var(--text); pointer-events: none;
+    }
+    #topbar .title { font-weight: 700; font-size: 16px; pointer-events: none; }
+    #topbar .spacer { flex: 1; }
+    #topbar button {
+      pointer-events: auto;
+      border: 0; border-radius: 999px; padding: 8px 14px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      background: var(--accent); color: #fff;
+    }
+    #topbar button.ghost { background: rgba(255,255,255,.22); color: #fff; }
+
+    /* "Dein nächster Set"-Banner */
+    #nextSet {
+      position: fixed; top: calc(60px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+      z-index: 1000; max-width: 92%;
+      background: rgba(25,12,13,.92); color: #fff;
+      padding: 9px 16px; border-radius: 999px; font-size: 13.5px;
+      box-shadow: 0 4px 14px rgba(0,0,0,.3); cursor: pointer;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      display: none; border: 1px solid rgba(255,255,255,.12);
+    }
+    #nextSet.show { display: block; }
+    #nextSet.live { background: var(--accent); border-color: transparent; animation: pulse 1.6s infinite; }
+    #nextSet b { font-weight: 700; }
+    @keyframes pulse { 0%,100% { box-shadow: 0 4px 14px rgba(195,66,84,.4); } 50% { box-shadow: 0 4px 22px rgba(195,66,84,.9); } }
+
+    /* Name overlay */
+    #nameOverlay, #installOverlay {
+      position: fixed; inset: 0; z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg); color: var(--text); padding: 24px;
+    }
+    #nameOverlay .card, #installOverlay .card { width: 100%; max-width: 340px; text-align: center; }
+    #nameOverlay h1, #installOverlay h1 { font-size: 22px; margin: 0 0 6px; }
+    #nameOverlay p, #installOverlay p { opacity: .8; font-size: 14px; margin: 0 0 20px; }
+    #installOverlay .install-steps { text-align: left; opacity: .95; font-size: 15px; line-height: 1.9; margin: 0 auto 16px; max-width: 280px; padding-left: 22px; }
+    #installOverlay .install-steps b { color: #fff; }
+    #installOverlay .ish { font-size: 17px; }
+    #installOverlay .install-hint { opacity: .65; font-size: 13px; margin: 0; }
+    #nameOverlay input {
+      width: 100%; padding: 14px; font-size: 16px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: #fff;
+      margin-bottom: 12px;
+    }
+    #nameOverlay input::placeholder { color: rgba(255,255,255,.5); }
+    #nameOverlay button {
+      width: 100%; padding: 14px; font-size: 16px; font-weight: 700;
+      border: 0; border-radius: 12px; background: var(--accent); color: #fff; cursor: pointer;
+    }
+    .hidden { display: none !important; }
+
+    /* Friend marker pin */
+    .friend-pin {
+      display: flex; flex-direction: column; align-items: center;
+      transform: translateY(-4px);
+    }
+    .friend-pin .dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 3px solid #fff; box-shadow: 0 0 0 2px rgba(0,0,0,.25), 0 2px 6px rgba(0,0,0,.4);
+    }
+    .friend-pin .label {
+      margin-top: 3px; font-size: 11px; font-weight: 700; color: #111;
+      background: #fff; padding: 1px 7px; border-radius: 999px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.3); white-space: nowrap;
+    }
+    .friend-pin.me .dot { background: #2b7fff; }
+    .friend-pin .dot { background: #00c389; }
+    .friend-pin.offline { opacity: .7; }
+    .friend-pin.offline .dot { border-color: #ffd6d6; box-shadow: 0 0 0 2px rgba(224,49,49,.3), 0 2px 6px rgba(0,0,0,.3); }
+    .friend-pin.offline .label { color: #c00; background: #ffe9e9; }
+
+    /* Venue marker */
+    .venue-pin {
+      position: relative;
+      width: 30px; height: 30px; border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.4);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .venue-pin span { transform: rotate(45deg); font-size: 15px; }
+
+    .leaflet-popup-content { margin: 12px 14px; font-size: 14px; }
+    .leaflet-popup-content b { font-size: 15px; }
+    .leaflet-popup-content .route-btn {
+      display: inline-block; margin-top: 8px; padding: 8px 14px;
+      background: var(--accent); color: #fff; border-radius: 999px;
+      text-decoration: none; font-weight: 600; font-size: 13px;
+    }
+    .leaflet-popup-content .sub { color: #666; font-size: 12px; margin-top: 2px; }
+    .leaflet-popup-content .dist { margin-top: 6px; font-size: 12.5px; color: #c34254; font-weight: 600; }
+    .venue-popup .lineup {
+      margin-top: 8px; max-height: 190px; overflow-y: auto;
+      border-top: 1px solid #eee; padding-top: 4px;
+    }
+    .venue-popup .slot {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 2px; font-size: 12.5px; border-bottom: 1px solid #f3f3f3;
+    }
+    .venue-popup .slot .t { color: #888; font-variant-numeric: tabular-nums; min-width: 38px; }
+    .venue-popup .slot .a { flex: 1; color: #222; }
+    .venue-popup .slot.past { opacity: .4; }
+    .venue-popup .slot.me { background: #fff5e6; border-radius: 6px; }
+    .venue-popup .slot.me .a { font-weight: 800; color: #b06b00; }
+    .venue-popup .slot.live { background: #ffe9ec; border-radius: 6px; }
+    .venue-popup .slot.live .a { font-weight: 800; color: #c34254; }
+    .venue-popup .slot .tag { font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 999px; white-space: nowrap; }
+    .venue-popup .slot .tag.live { background: #c34254; color: #fff; }
+    .venue-popup .slot .tag.star { background: #ffd591; color: #7a4a00; }
+    .friend-popup b { font-size: 15px; }
+    .friend-popup .sub { color: #666; font-size: 12px; margin-top: 2px; }
+
+    #status {
+      position: fixed; bottom: calc(70px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+      z-index: 1000; background: rgba(25,12,13,.9); color: #fff;
+      padding: 7px 15px; border-radius: 999px; font-size: 12.5px;
+      max-width: 90%; text-align: center;
+    }
+
+    /* Status-Badge am Punkt */
+    .friend-pin .dot { position: relative; }
+    .status-badge {
+      position: absolute; top: -10px; right: -10px; font-size: 12px;
+      background: #fff; border-radius: 50%; width: 17px; height: 17px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,.35);
+    }
+
+    /* Bottom-Bar */
+    #bottomBar {
+      position: fixed; bottom: calc(14px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+      z-index: 1001; display: flex; gap: 10px;
+    }
+    #bottomBar button {
+      border: 0; border-radius: 999px; padding: 11px 18px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      background: var(--bg); color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    /* Toast */
+    #toast {
+      position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%) translateY(20px);
+      z-index: 3000; background: var(--accent); color: #fff;
+      padding: 12px 18px; border-radius: 14px; font-size: 14px; font-weight: 600;
+      max-width: 88%; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,.4);
+      opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Sheets (Programm / Status) */
+    .sheet {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 2500;
+      background: #fff; border-radius: 18px 18px 0 0; max-height: 75%;
+      box-shadow: 0 -6px 30px rgba(0,0,0,.3); overflow: hidden;
+      display: flex; flex-direction: column;
+      animation: slideUp .22s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 18px 10px; font-weight: 800; font-size: 16px; color: #190c0d;
+    }
+    .sheet-head button { border: 0; background: #eee; border-radius: 50%; width: 30px; height: 30px; font-size: 14px; cursor: pointer; }
+
+    #tlList { overflow-y: auto; padding: 0 14px calc(16px + env(safe-area-inset-bottom)); }
+    .tl-row {
+      display: flex; align-items: center; gap: 12px; padding: 12px 8px;
+      border-bottom: 1px solid #f0f0f0; cursor: pointer;
+    }
+    .tl-row.past { opacity: .45; }
+    .tl-row.live { background: #fff5f6; border-radius: 12px; }
+    .tl-dot { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .tl-mid { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+    .tl-name { font-weight: 700; font-size: 14.5px; color: #190c0d; }
+    .tl-time { font-size: 12.5px; color: #888; font-variant-numeric: tabular-nums; }
+    .tl-star, .tl-icon { font-size: 12px; }
+    .tl-row.fav { background: #fffbe6; border-radius: 12px; }
+    #tlFilter { padding: 2px 14px 8px; flex-shrink: 0; }
+    .tl-filter { border: 1px solid #e5d28a; background: #fff8e1; color: #8a6d00; border-radius: 999px; padding: 7px 16px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .tl-filter.active { background: #ffd591; border-color: #f0b429; }
+
+    /* Favoriten-Stern am Karten-Pin */
+    .venue-pin .fav-badge {
+      position: absolute; top: -8px; right: -8px; font-size: 13px;
+      transform: rotate(45deg);
+    }
+    .venue-pin.fav { box-shadow: 0 0 0 3px #ffd591, 0 2px 6px rgba(0,0,0,.4); }
+
+    /* Favoriten-Button im Popup */
+    .venue-popup .fav-btn {
+      display: inline-block; margin-top: 8px; margin-right: 8px; padding: 7px 14px;
+      border: 1px solid #f0b429; background: #fff8e1; color: #8a6d00;
+      border-radius: 999px; font-weight: 700; font-size: 13px; cursor: pointer;
+    }
+    .venue-popup .fav-btn.active { background: #ffd591; }
+    .tl-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; background: #eee; color: #555; white-space: nowrap; }
+    .tl-badge.live { background: #c34254; color: #fff; }
+    .tl-badge.past { background: transparent; color: #aaa; }
+
+    #stOptions { display: flex; flex-direction: column; gap: 8px; padding: 4px 16px 20px; }
+    .st-opt {
+      text-align: left; border: 1px solid #eee; background: #fafafa;
+      border-radius: 12px; padding: 14px 16px; font-size: 15px; font-weight: 600; cursor: pointer; color: #190c0d;
+    }
+    .st-opt.active { border-color: var(--accent); background: #fff0f2; color: var(--accent); }
+    .st-opt.clear { color: #999; font-weight: 500; }
+    #pushRow { padding: 6px 16px calc(20px + env(safe-area-inset-bottom)); border-top: 1px solid #f0f0f0; margin-top: 4px; }
+    #pushBtn { width: 100%; padding: 14px; border: 0; border-radius: 12px; background: var(--bg); color: #fff; font-size: 14.5px; font-weight: 700; cursor: pointer; }
+    #pushBtn.active { background: #e7f9ee; color: #099; border: 1px solid #9be3c0; }
+
+    /* Event hinzufügen */
+    .head-actions { display: flex; align-items: center; gap: 8px; }
+    .head-add { width: auto !important; border-radius: 999px !important; padding: 0 12px !important; height: 32px !important; background: var(--accent) !important; color: #fff !important; font-size: 13px !important; font-weight: 700; }
+    #aeForm { overflow-y: auto; padding: 4px 16px calc(20px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+    #aeForm label { display: flex; flex-direction: column; gap: 5px; font-size: 13px; font-weight: 600; color: #555; }
+    #aeForm input { border: 1px solid #ddd; border-radius: 10px; padding: 12px; font-size: 16px; color: #190c0d; }
+    #aeForm input:focus { border-color: var(--accent); outline: none; }
+    .ae-row { display: flex; gap: 12px; }
+    .ae-row label { flex: 1; }
+    .ae-divider { font-size: 12px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: .04em; margin-top: 4px; border-top: 1px solid #f0f0f0; padding-top: 12px; }
+    #aeSubmit { border: 0; border-radius: 12px; padding: 15px; font-size: 16px; font-weight: 700; background: var(--accent); color: #fff; cursor: pointer; margin-top: 4px; }
+    #aeMsg { font-size: 13px; color: #c34254; text-align: center; min-height: 18px; }
+    .venue-popup .del-event-btn { display: block; width: 100%; margin-top: 8px; padding: 8px; background: #fff0f0; color: #c92a2a; border: 1px solid #ffc9c9; border-radius: 999px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+
+    /* Chat-Badge am Button */
+    #chatBtn { position: relative; }
+    #chatBadge {
+      display: none; position: absolute; top: -5px; right: -5px;
+      min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+      background: var(--accent); color: #fff; font-size: 11px; font-weight: 800;
+      line-height: 18px; text-align: center; border: 2px solid var(--bg);
+    }
+    #chatBadge.show { display: block; }
+
+    /* Chat-Sheet */
+    #chatSheet { height: 80%; max-height: 80%; }
+    #chList { flex: 1; overflow-y: auto; padding: 6px 14px 10px; display: flex; flex-direction: column; gap: 8px; }
+    .chat-empty { text-align: center; color: #aaa; font-size: 13px; padding: 24px; }
+    .msg { max-width: 78%; display: flex; flex-direction: column; }
+    .msg .who { font-size: 11px; font-weight: 700; color: #888; margin: 0 0 2px 10px; }
+    .msg .bubble {
+      padding: 9px 13px; border-radius: 16px; font-size: 14.5px; line-height: 1.35;
+      background: #f0f0f2; color: #190c0d; word-wrap: break-word; overflow-wrap: anywhere;
+    }
+    .msg .time { font-size: 10px; color: #b0b0b0; margin: 2px 0 0 10px; }
+    .msg.mine { align-self: flex-end; align-items: flex-end; }
+    .msg.mine .bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 5px; }
+    .msg.mine .time, .msg.mine .who { margin-left: 0; margin-right: 10px; }
+    .msg.theirs .bubble { border-bottom-left-radius: 5px; }
+
+    #chInputBar { display: flex; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid #eee; background: #fff; }
+    #chInput { flex: 1; border: 1px solid #ddd; border-radius: 999px; padding: 12px 16px; font-size: 15px; outline: none; }
+    #chInput:focus { border-color: var(--accent); }
+    #chSend { border: 0; border-radius: 999px; padding: 0 18px; font-size: 14px; font-weight: 700; background: var(--accent); color: #fff; cursor: pointer; }
+
+    /* Chat-Tabs */
+    #chTabs {
+      display: flex; gap: 6px; padding: 4px 12px 8px; overflow-x: auto;
+      border-bottom: 1px solid #eee; flex-shrink: 0;
+    }
+    #chTabs::-webkit-scrollbar { display: none; }
+    .ch-tab {
+      position: relative; border: 1px solid #e5e5e5; background: #f7f7f8;
+      padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; color: #555;
+    }
+    .ch-tab.active { background: var(--bg); color: #fff; border-color: var(--bg); }
+    .tab-badge {
+      display: inline-block; min-width: 16px; height: 16px; padding: 0 5px;
+      margin-left: 6px; border-radius: 999px; background: var(--accent); color: #fff;
+      font-size: 10px; font-weight: 800; line-height: 16px;
+    }
+
+    /* Crew-Liste */
+    #crewList { overflow-y: auto; padding: 0 12px calc(16px + env(safe-area-inset-bottom)); }
+    .crew-row {
+      display: flex; align-items: center; gap: 12px; padding: 11px 8px;
+      border-bottom: 1px solid #f0f0f0; cursor: pointer;
+    }
+    .crew-avatar { position: relative; width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .crew-dot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+    .crew-online { position: absolute; right: 0; bottom: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; }
+    .crew-online.on { background: #2cb846; }
+    .crew-online.off { background: #e03131; }
+    .crew-mid { flex: 1; min-width: 0; }
+    .crew-name { font-weight: 700; font-size: 14.5px; color: #190c0d; }
+    .crew-name .crew-me { color: #999; font-weight: 500; font-size: 12px; }
+    .crew-sub { font-size: 12.5px; color: #888; margin-top: 1px; }
+    .crew-go {
+      border: 0; background: var(--bg); color: #fff; border-radius: 999px;
+      padding: 7px 12px; font-size: 13px; cursor: pointer; flex-shrink: 0;
+    }
+    .crew-del {
+      border: 0; background: #fff0f0; color: #c92a2a; border-radius: 999px;
+      padding: 7px 11px; font-size: 14px; cursor: pointer; flex-shrink: 0; margin-right: 6px;
+    }
+
+    /* Offline-Hinweis im Friend-Popup */
+    .friend-popup .offline-line { color: #e03131; font-weight: 700; }
+
+    /* DM-Button im Friend-Popup */
+    .dm-btn {
+      display: block; width: 100%; margin-top: 6px; padding: 8px 14px;
+      background: var(--bg); color: #fff; border: 0; border-radius: 999px;
+      font-weight: 600; font-size: 13px; cursor: pointer;
+    }
+
+    /* Foto-Avatare */
+    .friend-pin .dot.photo { background-size: cover; background-position: center; background-repeat: no-repeat; }
+    .crew-dot.photo { background-size: cover; background-position: center; background-repeat: no-repeat; }
+
+    /* Foto-Picker im Namen-Overlay */
+    #photoPick { display: flex; align-items: center; gap: 12px; justify-content: center; margin-bottom: 14px; cursor: pointer; }
+    #photoPreview {
+      width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(255,255,255,.12); border: 2px dashed rgba(255,255,255,.4);
+      background-size: cover; background-position: center;
+    }
+    #photoPreview.has { border-style: solid; border-color: var(--accent); }
+    #photoPick .photo-label { font-size: 14px; color: rgba(255,255,255,.85); }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div id="topbar">
+    <div class="title">📍 FDLM Live</div>
+    <div class="spacer"></div>
+    <button id="allBtn" class="ghost">Alle</button>
+    <button id="recenterBtn" class="ghost">Mich</button>
+    <button id="hideBtn">Sichtbar</button>
+  </div>
+
+  <div id="nextSet"></div>
+
+  <div id="status">Starte…</div>
+
+  <div id="bottomBar">
+    <button id="programBtn">📋 Programm</button>
+    <button id="crewBtn">👥 Crew</button>
+    <button id="chatBtn">💬 Chat<span id="chatBadge"></span></button>
+    <button id="statusBtn">🙋 Status</button>
+  </div>
+
+  <div id="toast"></div>
+
+  <!-- Programm-Timeline -->
+  <div id="timeline" class="sheet hidden">
+    <div class="sheet-head"><span>📋 Programm</span><div class="head-actions"><button id="aeOpen" class="head-add">➕ Event</button><button id="tlClose">✕</button></div></div>
+    <div id="tlFilter"></div>
+    <div id="tlList"></div>
+  </div>
+
+  <!-- Crew-Liste -->
+  <div id="crewSheet" class="sheet hidden">
+    <div class="sheet-head"><span>👥 Crew</span><button id="crClose">✕</button></div>
+    <div id="crewList"></div>
+  </div>
+
+  <!-- Crew-Chat + DMs -->
+  <div id="chatSheet" class="sheet hidden">
+    <div class="sheet-head"><span id="chatTitle">💬 Crew-Chat</span><button id="chClose">✕</button></div>
+    <div id="chTabs"></div>
+    <div id="chList"></div>
+    <div id="chInputBar">
+      <input id="chInput" type="text" placeholder="Nachricht an die Crew…" maxlength="280" autocomplete="off" />
+      <button id="chSend">Senden</button>
+    </div>
+  </div>
+
+  <!-- Event hinzufügen -->
+  <div id="addEventSheet" class="sheet hidden">
+    <div class="sheet-head"><span>➕ Event hinzufügen</span><button id="aeClose">✕</button></div>
+    <div id="aeForm">
+      <label>Name<input id="aeName" type="text" placeholder="z.B. Sunset Rooftop" maxlength="60" autocomplete="off" /></label>
+      <label>Adresse (in Paris)<input id="aeAddr" type="text" placeholder="z.B. 5 Rue de Rivoli" maxlength="120" autocomplete="off" /></label>
+      <label>Datum<input id="aeDate" type="date" value="2026-06-21" /></label>
+      <div class="ae-row">
+        <label>Von<input id="aeVon" type="time" value="22:00" /></label>
+        <label>Bis<input id="aeBis" type="time" value="04:00" /></label>
+      </div>
+      <div class="ae-divider">Act (optional)</div>
+      <label>Act-Name<input id="aeAct" type="text" placeholder="DJ / Live-Act" maxlength="40" autocomplete="off" /></label>
+      <div class="ae-row">
+        <label>Act von<input id="aeActVon" type="time" /></label>
+        <label>Act bis<input id="aeActBis" type="time" /></label>
+      </div>
+      <button id="aeSubmit">Event speichern</button>
+      <div id="aeMsg"></div>
+    </div>
+  </div>
+
+  <!-- Status-Picker -->
+  <div id="statusSheet" class="sheet hidden">
+    <div class="sheet-head"><span>💬 Dein Status</span><button id="stClose">✕</button></div>
+    <div id="stOptions"></div>
+    <div id="pushRow"><button id="pushBtn">🔔 Push-Benachrichtigungen aktivieren</button></div>
+  </div>
+
+  <div id="installOverlay" class="hidden">
+    <div class="card">
+      <h1>📍 FDLM Live</h1>
+      <p>Damit Benachrichtigungen funktionieren, musst du die App kurz zum Home-Bildschirm hinzufügen — danach von dort öffnen.</p>
+      <ol class="install-steps">
+        <li>Unten auf <b>Teilen</b> tippen <span class="ish">⬆️</span></li>
+        <li><b>„Zum Home-Bildschirm"</b> wählen</li>
+        <li>Diese App über das <b>neue Icon</b> öffnen</li>
+      </ol>
+      <p class="install-hint">Dann Namen eingeben & „Erlauben" tippen — fertig.</p>
+    </div>
+  </div>
+
+  <div id="nameOverlay">
+    <div class="card">
+      <h1>Wer bist du?</h1>
+      <p>Name &amp; (optional) Foto werden deiner Crew auf der Karte angezeigt.</p>
+      <input id="nameInput" type="text" placeholder="z.B. Leroy" maxlength="20" autocomplete="off" />
+      <label id="photoPick" for="photoInput">
+        <span id="photoPreview"></span>
+        <span class="photo-label">📷 Foto hinzufügen (optional)</span>
+      </label>
+      <input id="photoInput" type="file" accept="image/*" class="hidden" />
+      <button id="nameSubmit">Los geht's</button>
+    </div>
+  </div>
+
+  <script src="config.js?v=1"></script>
+  <script src="app.js?v=1"></script>
+</body>
+</html>
