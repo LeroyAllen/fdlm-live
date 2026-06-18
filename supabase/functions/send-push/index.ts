@@ -55,8 +55,8 @@ Deno.serve(async (req: Request) => {
     else if (kind === "dm") targets = targets.filter((s) => s.uid === recipientUid);
     else targets = [];
 
-    const title = kind === "crew" ? "💬 Crew-Chat" : `💬 ${name || "Freund"} (privat)`;
-    const body = kind === "crew" ? `${name || "Freund"}: ${text}` : text;
+    const title = kind === "crew" ? "💬 Crew Chat" : `💬 ${name || "Friend"} (private)`;
+    const body = kind === "crew" ? `${name || "Friend"}: ${text}` : text;
     const payload = JSON.stringify({ title, body, url: "./" });
 
     let sent = 0;

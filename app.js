@@ -5,7 +5,7 @@ const VENUES = [
   {
     id: "careful", name: "Trendy x Careful", lat: 48.8402962, lng: 2.3705034,
     emoji: "🎶", color: "#e4a13f", address: "Wanderlust, 32 Quai d'Austerlitz, 75013",
-    dateLabel: "Nacht Sa→So, 20.–21.06.",
+    dateLabel: "Night Sat→Sun, 20–21 Jun",
     lineup: [
       { s: "2026-06-21T01:00:00+02:00", e: "2026-06-21T01:45:00+02:00", act: "AMOS JOAN", me: true },
       { s: "2026-06-21T01:45:00+02:00", e: "2026-06-21T02:30:00+02:00", act: "ALICE" },
@@ -19,7 +19,7 @@ const VENUES = [
   {
     id: "nuu", name: "NUU", lat: 48.8635854, lng: 2.3490793,
     emoji: "🎶", color: "#7b3fe4", address: "30 Rue Pierre Lescot, 75001",
-    dateLabel: "So 21.06.",
+    dateLabel: "Sun 21 Jun",
     lineup: [
       { s: "2026-06-21T15:00:00+02:00", e: "2026-06-21T15:45:00+02:00", act: "UCHE" },
       { s: "2026-06-21T15:45:00+02:00", e: "2026-06-21T16:30:00+02:00", act: "LINO B2B SCOT" },
@@ -38,7 +38,7 @@ const VENUES = [
   {
     id: "sixtion", name: "Sixtion x LaSunday", lat: 48.8841454, lng: 2.3322002,
     emoji: "🎶", color: "#c34254", address: "La Machine du Moulin Rouge, 90 Bd de Clichy, 75018",
-    dateLabel: "Nacht So→Mo, 21.–22.06.",
+    dateLabel: "Night Sun→Mon, 21–22 Jun",
     lineup: [
       { s: "2026-06-22T00:00:00+02:00", e: "2026-06-22T01:00:00+02:00", act: "NEWCOMER" },
       { s: "2026-06-22T01:00:00+02:00", e: "2026-06-22T01:45:00+02:00", act: "AMOS JOAN", me: true },
@@ -53,7 +53,7 @@ const VENUES = [
   {
     id: "submundo", name: "Submundo 808 x Midnight", lat: 48.8678381, lng: 2.3552755,
     emoji: "🎉", color: "#12b886", address: "67 Rue Notre-Dame de Nazareth, 75003",
-    dateLabel: "So 21.06. · 16:00–01:00",
+    dateLabel: "Sun 21 Jun · 16:00–01:00",
     start: "2026-06-21T16:00:00+02:00", end: "2026-06-22T01:00:00+02:00",
     lineup: [
       { s: "2026-06-21T16:00:00+02:00", e: "2026-06-21T16:40:00+02:00", act: "Medussar b2b Nokiaze" },
@@ -74,7 +74,7 @@ const VENUES = [
   {
     id: "adesso", name: "Adesso Blockparty", lat: 48.8613412, lng: 2.3583352,
     emoji: "🎉", color: "#e64980", address: "83 Rue des Archives, 75003",
-    dateLabel: "So 21.06. · 14:30–01:00",
+    dateLabel: "Sun 21 Jun · 14:30–01:00",
     start: "2026-06-21T14:30:00+02:00", end: "2026-06-22T01:00:00+02:00",
     lineup: [
       { s: "2026-06-21T14:30:00+02:00", e: "2026-06-21T15:15:00+02:00", act: "Emblaiza" },
@@ -97,13 +97,13 @@ const VENUES = [
   {
     id: "baile", name: "Baile da Eurotrip", lat: 48.8598930, lng: 2.3406181,
     emoji: "🎉", color: "#22b8cf", address: "Place du Louvre, 75001",
-    dateLabel: "So 21.06. · 16:00–00:00", lineup: [],
+    dateLabel: "Sun 21 Jun · 16:00–00:00", lineup: [],
     start: "2026-06-21T16:00:00+02:00", end: "2026-06-22T00:00:00+02:00",
   },
   {
     id: "houseofnine", name: "House Of Nine x BABEWYD", lat: 48.8674641, lng: 2.3414034,
     emoji: "🎉", color: "#fab005", address: "7 Rue Notre-Dame des Victoires, 75002",
-    dateLabel: "Fr 19.06. · 14:00–22:00",
+    dateLabel: "Fri 19 Jun · 14:00–22:00",
     start: "2026-06-19T14:00:00+02:00", end: "2026-06-19T22:00:00+02:00",
     lineup: [
       { s: "2026-06-19T18:00:00+02:00", e: "2026-06-19T18:30:00+02:00", act: "Naomi Yasmine" },
@@ -114,7 +114,7 @@ const VENUES = [
   {
     id: "jeleel", name: "Jeleel's Wave", lat: 48.8818792, lng: 2.3369831,
     emoji: "🎉", color: "#fd7e14", address: "Rouge Pigalle, 77 Rue Jean-Baptiste Pigalle, 75009",
-    dateLabel: "Sa→So 20.–21.06. · 23:00–06:00",
+    dateLabel: "Sat→Sun 20–21 Jun · 23:00–06:00",
     start: "2026-06-20T23:00:00+02:00", end: "2026-06-21T06:00:00+02:00",
     lineup: [
       { s: "2026-06-21T00:30:00+02:00", e: "2026-06-21T01:30:00+02:00", act: "Naomi Yasmine" },
@@ -123,7 +123,7 @@ const VENUES = [
   {
     id: "fdlm", name: "FDLM", lat: 48.8647875, lng: 2.3346137,
     emoji: "🎉", color: "#5f3dc4", address: "5 Avenue de l'Opéra, 75001",
-    dateLabel: "So 21.06. · 14:00–02:00",
+    dateLabel: "Sun 21 Jun · 14:00–02:00",
     start: "2026-06-21T14:00:00+02:00", end: "2026-06-22T02:00:00+02:00",
     lineup: [
       { s: "2026-06-21T15:00:00+02:00", e: "2026-06-21T15:30:00+02:00", act: "Naomi Yasmine" },
@@ -132,7 +132,7 @@ const VENUES = [
   {
     id: "genesis", name: "Genesis Block Party", lat: 48.8619727, lng: 2.3657451,
     emoji: "🎉", color: "#74b816", address: "Rue Commines, 75003",
-    dateLabel: "So 21.06. · 14:00–23:00",
+    dateLabel: "Sun 21 Jun · 14:00–23:00",
     start: "2026-06-21T14:00:00+02:00", end: "2026-06-21T23:00:00+02:00",
     lineup: [
       { s: "2026-06-21T19:00:00+02:00", e: "2026-06-21T19:30:00+02:00", act: "NLSON" },
@@ -141,7 +141,7 @@ const VENUES = [
   {
     id: "sixtionfdlm", name: "Sixtion FDLM Afterparty Pt. 1", lat: 48.8922406, lng: 2.3878226,
     emoji: "🎉", color: "#d6336c", address: "Cabaret Sauvage, Parc de la Villette, 75019",
-    dateLabel: "So→Mo 21.–22.06. · 23:00–05:00",
+    dateLabel: "Sun→Mon 21–22 Jun · 23:00–05:00",
     start: "2026-06-21T23:00:00+02:00", end: "2026-06-22T05:00:00+02:00",
     lineup: [
       { s: "2026-06-22T00:00:00+02:00", e: "2026-06-22T01:00:00+02:00", act: "NLSON" },
@@ -150,7 +150,7 @@ const VENUES = [
   {
     id: "closefriends", name: "Close Friends x Trendy", lat: 48.8404962, lng: 2.3706034,
     emoji: "🎉", color: "#1098ad", address: "Wanderlust, 32 Quai d'Austerlitz, 75013",
-    dateLabel: "So→Mo 21.–22.06. · 23:00–05:00",
+    dateLabel: "Sun→Mon 21–22 Jun · 23:00–05:00",
     start: "2026-06-21T23:00:00+02:00", end: "2026-06-22T05:00:00+02:00",
     lineup: [
       { s: "2026-06-22T00:00:00+02:00", e: "2026-06-22T01:00:00+02:00", act: "Kelly Jackson" },
@@ -159,7 +159,7 @@ const VENUES = [
   {
     id: "home", name: "Home", lat: 48.8880087, lng: 2.3909356,
     emoji: "🏠", color: "#2b7fff", address: "Au Bœuf Couronné, 188 Av. Jean Jaurès, 75019",
-    dateLabel: "Euer Hotel",
+    dateLabel: "Your hotel",
     lineup: [],
   },
 ];
@@ -169,9 +169,9 @@ function setStatus(msg) { statusEl.textContent = msg; }
 
 // ---- Helfer ----
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
-function fmtTime(iso) { return new Intl.DateTimeFormat("de-DE", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" }).format(new Date(iso)); }
-function fmtDay(ms) { return new Intl.DateTimeFormat("de-DE", { weekday: "short", day: "2-digit", month: "2-digit", timeZone: "Europe/Paris" }).format(new Date(ms)); }
-function fmtWeekday(ms) { return new Intl.DateTimeFormat("de-DE", { weekday: "short", timeZone: "Europe/Paris" }).format(new Date(ms)).replace(".", ""); }
+function fmtTime(iso) { return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" }).format(new Date(iso)); }
+function fmtDay(ms) { return new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "2-digit", month: "2-digit", timeZone: "Europe/Paris" }).format(new Date(ms)); }
+function fmtWeekday(ms) { return new Intl.DateTimeFormat("en-GB", { weekday: "short", timeZone: "Europe/Paris" }).format(new Date(ms)).replace(".", ""); }
 function haversineKm(a, b) {
   const R = 6371, toRad = x => x * Math.PI / 180;
   const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
@@ -200,6 +200,12 @@ let chatInited = false;
 let favs = new Set(JSON.parse(localStorage.getItem("plm_favs") || "[]"));
 let tlFavOnly = false;
 function isFav(id) { return favs.has(id); }
+// Verwaltungs-Rechte: nur Leroy & Amos (matcht auch "Amos Joan", "Leroy Allen").
+// Hinweis: rein UI-seitig — die App hat keine echte Auth (nur selbst gewählter Name).
+function isAdmin() {
+  const n = (userName || "").trim().toLowerCase();
+  return n.includes("leroy") || n.includes("amos");
+}
 function toggleFav(id) {
   if (favs.has(id)) favs.delete(id); else favs.add(id);
   localStorage.setItem("plm_favs", JSON.stringify([...favs]));
@@ -212,7 +218,11 @@ function colorForUid(uid) {
   return FRIEND_COLORS[h % FRIEND_COLORS.length];
 }
 
-// ---- Karte ----
+// Live crew state — declared early because the venue crew-count badges (B) read
+// friendData on the very first renderVenueMarkers() below.
+const friendMarkers = {}, friendData = {};
+
+// ---- Map ----
 const map = L.map("map", { zoomControl: true }).setView([48.8649, 2.3550], 13);
 const baseStreets = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
   maxZoom: 20, subdomains: "abcd", detectRetina: true,
@@ -221,7 +231,29 @@ const baseStreets = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/v
 const baseSatellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
   maxZoom: 19, attribution: '© Esri, Maxar, Earthstar Geographics',
 });
-L.control.layers({ "🗺️ Karte": baseStreets, "🛰️ Satellit": baseSatellite }, null, { position: "topright", collapsed: true }).addTo(map);
+let layersControl = L.control.layers({ "🗺️ Map": baseStreets, "🛰️ Satellite": baseSatellite }, null, { position: "topright", collapsed: true }).addTo(map);
+
+// Real Google Maps — only if an API key is set in config.js. Loads Google's
+// official JS API and renders it as a Leaflet layer (GoogleMutant), so all
+// existing markers/popups/controls keep working unchanged. No key → CARTO stays.
+if (window.__GMAPS_KEY && window.L && L.gridLayer && L.gridLayer.googleMutant) {
+  window.__initGmaps = () => {
+    try {
+      const gRoad = L.gridLayer.googleMutant({ type: "roadmap" });
+      const gSat = L.gridLayer.googleMutant({ type: "hybrid" });
+      map.removeLayer(baseStreets);
+      if (layersControl) map.removeControl(layersControl);
+      gRoad.addTo(map);
+      layersControl = L.control.layers({ "🗺️ Google": gRoad, "🛰️ Satellite": gSat }, null, { position: "topright", collapsed: true }).addTo(map);
+      // GoogleMutant manchmal grau, bis die Karte einmal neu vermessen wird
+      setTimeout(() => map.invalidateSize(), 300);
+    } catch (e) { console.warn("Google Maps init failed — keeping fallback map", e); }
+  };
+  const gs = document.createElement("script");
+  gs.src = `https://maps.googleapis.com/maps/api/js?key=${window.__GMAPS_KEY}&loading=async&callback=__initGmaps`;
+  gs.async = true; gs.onerror = () => console.warn("Google Maps script failed to load — keeping fallback map");
+  document.head.appendChild(gs);
+}
 
 // ---- Orte (feste Events + selbst hinzugefügte aus der DB) ----
 let dbEvents = [];
@@ -229,11 +261,51 @@ function allVenues() { return VENUES.concat(dbEvents); }
 function venueById(id) { return allVenues().find(v => v.id === id); }
 function isDbEvent(id) { return dbEvents.some(e => e.id === id); }
 const venueMarkerById = {};
+// ---- Crew at a venue (B) — client-side proximity over the live friendData ----
+const CREW_VENUE_RADIUS_M = 110; // ~1 block tolerance for GPS jitter in dense Paris
+function crewAtVenue(v) {
+  if (!v || v.id === "home" || typeof v.lat !== "number") return [];
+  const out = [];
+  Object.entries(friendData).forEach(([uid, u]) => {
+    if (!u || typeof u.lat !== "number" || typeof u.lng !== "number") return;
+    if (u.hidden && uid !== USER_ID) return;
+    if (haversineKm(u, v) * 1000 <= CREW_VENUE_RADIUS_M) out.push({ uid, u });
+  });
+  return out;
+}
+function venueForMember(u) {
+  if (!u || typeof u.lat !== "number" || typeof u.lng !== "number") return null;
+  let best = null, bestKm = Infinity;
+  allVenues().forEach(v => {
+    if (v.id === "home" || typeof v.lat !== "number") return;
+    const km = haversineKm(u, v);
+    if (km * 1000 <= CREW_VENUE_RADIUS_M && km < bestKm) { bestKm = km; best = v; }
+  });
+  return best;
+}
+function crewHereHtml(v) {
+  const crew = crewAtVenue(v);
+  if (!crew.length) return "";
+  const rows = crew.map(({ uid, u }) => {
+    const isMe = uid === USER_ID;
+    const col = isMe ? "#2b7fff" : colorForUid(uid);
+    const dot = u.photo
+      ? `<span class="here-dot photo" style="background-image:url('${u.photo}')"></span>`
+      : `<span class="here-dot" style="background:${col}"></span>`;
+    const meTag = isMe ? ` <span class="here-you">(you)</span>` : "";
+    const off = isOnline(u) ? "" : " off";
+    return `<div class="here-row${off}">${dot}<span class="here-name">${escapeHtml(u.name || "?")}${meTag}</span></div>`;
+  }).join("");
+  return `<div class="here-list"><div class="here-hd">👥 ${crew.length} here now</div>${rows}</div>`;
+}
+
 function venueIcon(v) {
   const favBadge = isFav(v.id) ? `<span class="fav-badge">⭐</span>` : "";
+  const n = crewAtVenue(v).length;
+  const countBadge = n > 0 ? `<span class="crew-count">${n}</span>` : "";
   return L.divIcon({
     className: "",
-    html: `<div class="venue-pin ${isFav(v.id) ? "fav" : ""}" style="background:${v.color}"><span>${v.emoji}</span>${favBadge}</div>`,
+    html: `<div class="venue-pin ${isFav(v.id) ? "fav" : ""}" style="background:${v.color}"><span>${v.emoji}</span>${favBadge}${countBadge}</div>`,
     iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -28],
   });
 }
@@ -259,13 +331,17 @@ function renderVenueMarkers() {
 }
 renderVenueMarkers();
 
+// Google-Maps-Directions-Icon (Material "directions"-Glyph, weiß) — gleiches Design wie Google
+const DIR_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M22.43 10.59l-9.01-9.01c-.75-.75-2.07-.76-2.83 0l-9 9c-.78.78-.78 2.05 0 2.83l9 9c.39.39.9.58 1.41.58.51 0 1.02-.19 1.41-.58l8.99-8.99c.79-.76.8-2.05.03-2.84zM12.01 20.99l-9-9 9-9 9 9-9 9zM8 11v4h2v-3h4v2.5l3.5-3.5L14 7.5V10H9c-.55 0-1 .45-1 1z"/></svg>';
+
 function venuePopupHtml(v) {
   const now = Date.now();
+  const here = crewHereHtml(v); // B — who's here right now
   let dist = "";
   if (lastPos) {
     const km = haversineKm(lastPos, v);
     const min = Math.max(1, Math.round(km / 5 * 60)); // 5 km/h zu Fuß
-    dist = `<div class="dist">📍 ${km.toFixed(1).replace(".", ",")} km · ~${min} Min zu Fuß</div>`;
+    dist = `<div class="dist">📍 ${km.toFixed(1)} km · ~${min} min walk</div>`;
   }
   let lineup = "";
   if (v.lineup && v.lineup.length) {
@@ -273,17 +349,17 @@ function venuePopupHtml(v) {
       const s = new Date(sl.s).getTime(), e = new Date(sl.e).getTime();
       const live = now >= s && now < e, past = now >= e;
       const cls = [live ? "live" : "", past ? "past" : ""].filter(Boolean).join(" ");
-      const tag = live ? '<span class="tag live">▶ JETZT</span>' : "";
+      const tag = live ? '<span class="tag live">▶ NOW</span>' : "";
       return `<div class="slot ${cls}"><span class="t">${fmtTime(sl.s)}</span><span class="a">${escapeHtml(sl.act)}</span>${tag}</div>`;
     }).join("");
     lineup = `<div class="lineup">${rows}</div>`;
   }
-  const dir = `https://maps.apple.com/?daddr=${v.lat},${v.lng}&q=${encodeURIComponent(v.name)}`;
+  const dir = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.address || (v.lat + "," + v.lng))}`;
   const fav = isFav(v.id);
-  const favBtn = v.id === "home" ? "" : `<button class="fav-btn ${fav ? "active" : ""}" data-vid="${v.id}">${fav ? "⭐ Favorit" : "☆ Favorisieren"}</button>`;
-  const delBtn = isDbEvent(v.id) ? `<button class="del-event-btn" data-vid="${v.id}">🗑 Event löschen</button>` : "";
-  return `<div class="venue-popup"><b>${escapeHtml(v.name)}</b><div class="sub">${v.dateLabel} · ${escapeHtml(v.address)}</div>${favBtn}${dist}${lineup}` +
-         `<a class="route-btn" href="${dir}" target="_blank" rel="noopener">🧭 Route starten</a>${delBtn}</div>`;
+  const favBtn = v.id === "home" ? "" : `<button class="fav-btn ${fav ? "active" : ""}" data-vid="${v.id}">${fav ? "⭐ Favorite" : "☆ Add favorite"}</button>`;
+  const delBtn = (isDbEvent(v.id) && isAdmin()) ? `<button class="del-event-btn" data-vid="${v.id}">🗑 Delete event</button>` : "";
+  return `<div class="venue-popup"><b>${escapeHtml(v.name)}</b><div class="sub">${v.dateLabel} · ${escapeHtml(v.address)}</div>${favBtn}${dist}${here}${lineup}` +
+         `<a class="route-btn" href="${dir}" target="_blank" rel="noopener">${DIR_ICON}<span>Directions</span></a>${delBtn}</div>`;
 }
 
 // ---- "Dein nächster Stop"-Banner (nächster favorisierter Event) ----
@@ -303,10 +379,10 @@ function updateNextSet() {
   const live = stops.find(x => now >= x.s && now < x.e);
   const next = stops.find(x => x.s > now);
   if (live) {
-    el.innerHTML = `🔴 Läuft gerade: <b>${escapeHtml(live.v.name)}</b>`;
+    el.innerHTML = `🔴 Live now: <b>${escapeHtml(live.v.name)}</b>`;
     el.dataset.vid = live.v.id; el.classList.add("show", "live");
   } else if (next) {
-    el.innerHTML = `⭐ Dein nächster Stop: <b>${fmtDay(next.s)} ${fmtTime(next.s)}</b> @ ${escapeHtml(next.v.name)}`;
+    el.innerHTML = `⭐ Your next stop: <b>${fmtDay(next.s)} ${fmtTime(next.s)}</b> @ ${escapeHtml(next.v.name)}`;
     el.dataset.vid = next.v.id; el.classList.add("show"); el.classList.remove("live");
   } else {
     el.classList.remove("show", "live");
@@ -320,7 +396,9 @@ document.getElementById("nextSet").addEventListener("click", e => {
 
 // ---- Supabase ----
 let sb = null;
-const friendMarkers = {}, friendData = {};
+// Realtime channel handles — kept so we can tear them down and re-subscribe on reconnect (A1).
+let chMembers = null, chEvents = null, chMessages = null;
+let lastResync = 0, lastBeat = 0;
 
 function rowToMember(r) {
   return { id: r.id, name: r.name, photo: r.photo || null, lat: r.lat, lng: r.lng,
@@ -346,40 +424,92 @@ async function upsertMe() {
 
 function initSupabase() {
   const url = window.__SB_URL, key = window.__SB_ANON;
-  if (!url || !key || !window.supabase) { setStatus("⚠️ Supabase-Config fehlt — siehe config.js"); return false; }
+  if (!url || !key || !window.supabase) { setStatus("⚠️ Supabase config missing — see config.js"); return false; }
   sb = window.supabase.createClient(url, key, { realtime: { params: { eventsPerSecond: 5 } } });
+  reloadMembers();
+  reloadEvents();
+  setupChat();          // ensures the "crew" channel state exists
+  subscribeRealtime();
+  return true;
+}
 
-  // Mitglieder: initial + live (kein Auto-Remove → letzter Standort bleibt als Offline-Pin)
-  sb.from("members").select("*").then(({ data }) => renderFriends(membersById(data)));
-  sb.channel("members-rt")
+// Authoritative refetches — also reused by resync() on reconnect.
+async function reloadMembers() {
+  if (!sb) return;
+  // initial + on reconnect — no auto-remove, last location stays as an offline pin
+  const { data } = await sb.from("members").select("*");
+  renderFriends(membersById(data));
+}
+async function reloadEvents() {
+  if (!sb) return;
+  const { data } = await sb.from("events").select("*");
+  dbEvents = (data || []).map(rowToEvent);
+  renderVenueMarkers(); updateNextSet();
+  if (!document.getElementById("timeline").classList.contains("hidden")) renderTimeline();
+}
+
+// (Re-)subscribe all realtime channels. One code path for init AND reconnect → no drift.
+function subscribeRealtime() {
+  if (!sb) return;
+  chMembers = sb.channel("members-rt")
     .on("postgres_changes", { event: "*", schema: "public", table: "members" }, payload => {
       if (payload.eventType === "DELETE") { if (payload.old && payload.old.id) delete friendData[payload.old.id]; }
       else if (payload.new) { friendData[payload.new.id] = rowToMember(payload.new); }
       renderFriends(friendData);
     }).subscribe();
-
-  // Selbst hinzugefügte Events: initial + live
-  const reloadEvents = async () => {
-    const { data } = await sb.from("events").select("*");
-    dbEvents = (data || []).map(rowToEvent);
-    renderVenueMarkers(); updateNextSet();
-    if (!document.getElementById("timeline").classList.contains("hidden")) renderTimeline();
-  };
-  reloadEvents();
-  sb.channel("events-rt")
+  chEvents = sb.channel("events-rt")
     .on("postgres_changes", { event: "*", schema: "public", table: "events" }, reloadEvents)
     .subscribe();
+  chMessages = sb.channel("messages-rt")
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, onMessageInsert)
+    .subscribe();
+}
+function recreateRealtime() {
+  if (!sb) return;
+  [chMembers, chEvents, chMessages].forEach(ch => { if (ch) { try { sb.removeChannel(ch); } catch (e) {} } });
+  chMembers = chEvents = chMessages = null;
+  subscribeRealtime();
+}
 
-  setupChat();
-  return true;
+// A1 — foreground recovery: iOS PWA closes the realtime socket on background and
+// doesn't reliably reopen it. On return, authoritatively refetch + re-subscribe so
+// crew pins, events and chat never silently freeze.
+async function resync(reason) {
+  if (!sb || !userName) return;
+  const now = Date.now();
+  if (now - lastResync < 10000) return; // absorb double visibilitychange + online
+  lastResync = now;
+  setStatus("Reconnecting…");
+  try {
+    await Promise.all([reloadMembers(), reloadEvents()]);
+    await loadActiveChannelFresh();
+    await upsertMe();
+    recreateRealtime();
+  } catch (e) { console.warn("resync failed", e); }
+}
+// Re-pull the open chat channel (loadChannel early-returns once loaded; the seen-Set
+// dedupes, so only messages missed while backgrounded get added).
+async function loadActiveChannelFresh() {
+  const ch = activeChannel, st = channelState[ch];
+  if (!st || !sb) return;
+  st.loaded = false;
+  await loadChannel(ch);
+  if (chatOpen && activeChannel === ch) {
+    const listEl = document.getElementById("chList");
+    if (listEl) {
+      listEl.innerHTML = "";
+      st.messages.forEach(appendMessage);
+      setTimeout(() => { listEl.scrollTop = listEl.scrollHeight; }, 30);
+    }
+  }
 }
 
 // Status-Optionen
 const STATUSES = [
-  { key: "here", emoji: "📍", label: "bin hier" },
-  { key: "otw", emoji: "🚕", label: "unterwegs" },
-  { key: "bar", emoji: "🍹", label: "an der Bar" },
-  { key: "home", emoji: "🏠", label: "daheim" },
+  { key: "here", emoji: "📍", label: "I’m here" },
+  { key: "otw", emoji: "🚕", label: "on the way" },
+  { key: "bar", emoji: "🍹", label: "at the bar" },
+  { key: "home", emoji: "🏠", label: "home" },
 ];
 function statusOf(key) { return STATUSES.find(s => s.key === key); }
 
@@ -404,14 +534,14 @@ function friendPopupHtml(uid, u) {
   const online = isOnline(u);
   const st = statusOf(u.status);
   const stLine = st && online ? `<div class="sub">${st.emoji} ${st.label}</div>` : "";
-  if (uid === USER_ID) return `<div class="friend-popup"><b>${escapeHtml(u.name || "Du")}</b><div class="sub">Das bist du</div>${stLine}</div>`;
+  if (uid === USER_ID) return `<div class="friend-popup"><b>${escapeHtml(u.name || "You")}</b><div class="sub">That’s you</div>${stLine}</div>`;
   const mins = Math.round((Date.now() - (u.ts || 0)) / 60000);
-  const seen = mins <= 0 ? "gerade eben" : (mins === 1 ? "vor 1 Min" : `vor ${mins} Min`);
-  const offlineLine = online ? "" : `<div class="sub offline-line">🔴 Offline · letzter Standort</div>`;
-  const dir = `https://maps.apple.com/?daddr=${u.lat},${u.lng}&q=${encodeURIComponent(u.name || "Freund")}`;
-  return `<div class="friend-popup"><b>${escapeHtml(u.name || "?")}</b>${offlineLine}${stLine}<div class="sub">📡 Standort ${seen}</div>` +
-         `<a class="route-btn" href="${dir}" target="_blank" rel="noopener">🧭 Route zu ${escapeHtml(u.name || "Freund")}</a>` +
-         `<button class="dm-btn" data-uid="${uid}" data-name="${escapeHtml(u.name || "Freund")}">💬 Privat-Chat mit ${escapeHtml(u.name || "Freund")}</button></div>`;
+  const seen = mins <= 0 ? "just now" : (mins === 1 ? "1 min ago" : `${mins} min ago`);
+  const offlineLine = online ? "" : `<div class="sub offline-line">🔴 Offline · last location</div>`;
+  const dir = `https://www.google.com/maps/search/?api=1&query=${u.lat},${u.lng}`;
+  return `<div class="friend-popup"><b>${escapeHtml(u.name || "?")}</b>${offlineLine}${stLine}<div class="sub">📡 Location ${seen}</div>` +
+         `<a class="route-btn" href="${dir}" target="_blank" rel="noopener">${DIR_ICON}<span>Route to ${escapeHtml(u.name || "Friend")}</span></a>` +
+         `<button class="dm-btn" data-uid="${uid}" data-name="${escapeHtml(u.name || "Friend")}">💬 Private chat with ${escapeHtml(u.name || "Friend")}</button></div>`;
 }
 
 function renderFriends(data) {
@@ -440,34 +570,40 @@ function renderFriends(data) {
   Object.keys(friendMarkers).forEach(uid => {
     if (!seen.has(uid)) { map.removeLayer(friendMarkers[uid]); delete friendMarkers[uid]; }
   });
-  if (onlineCount === 0 && offlineCount === 0) setStatus("Du bist online — noch keine Freunde da");
+  if (onlineCount === 0 && offlineCount === 0) setStatus("You’re online — no friends yet");
   else if (offlineCount === 0) setStatus(`🟢 ${onlineCount} online`);
-  else if (onlineCount === 0) setStatus(`🔴 ${offlineCount} zuletzt gesehen`);
+  else if (onlineCount === 0) setStatus(`🔴 ${offlineCount} last seen`);
   else setStatus(`🟢 ${onlineCount} online · 🔴 ${offlineCount} offline`);
+  renderVenueMarkers(); // B — refresh venue crew-count badges from the latest positions
   renderCrewList();
 }
 
 // ---- Standort ----
 function startTracking() {
-  if (!navigator.geolocation) { setStatus("⚠️ Kein GPS verfügbar"); return; }
+  if (!navigator.geolocation) { setStatus("⚠️ No GPS available"); return; }
   let firstFix = true;
-  let lastUpload = 0, lastUpPos = null;
-  navigator.geolocation.watchPosition(
-    pos => {
-      const { latitude, longitude } = pos.coords;
-      lastPos = { lat: latitude, lng: longitude };
-      const now = Date.now();
-      const movedM = lastUpPos ? haversineKm(lastUpPos, lastPos) * 1000 : Infinity;
-      // Akku schonen: nur alle 5 Min ODER bei > 75 m Bewegung in die DB schreiben
-      if (firstFix || now - lastUpload > 5 * 60 * 1000 || movedM > 75) {
-        lastUpload = now; lastUpPos = lastPos;
-        upsertMe();
-      }
-      if (firstFix) { map.setView([latitude, longitude], 15); firstFix = false; }
-    },
-    err => { setStatus("⚠️ Standort blockiert — bitte GPS/Erlaubnis aktivieren"); console.warn(err); },
-    { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 }
-  );
+  let lastUpload = 0, lastUpPos = null, watchId = null;
+  const onErr = err => { setStatus("⚠️ Location blocked — enable GPS/permission"); console.warn(err); };
+  const onPos = pos => {
+    const { latitude, longitude } = pos.coords;
+    lastPos = { lat: latitude, lng: longitude };
+    const now = Date.now();
+    const movedM = lastUpPos ? haversineKm(lastUpPos, lastPos) * 1000 : Infinity;
+    // Battery: only write to the DB every 5 min OR after >75 m of movement.
+    if (firstFix || now - lastUpload > 5 * 60 * 1000 || movedM > 75) {
+      lastUpload = now; lastUpPos = lastPos;
+      upsertMe();
+    }
+    if (firstFix) {
+      map.setView([latitude, longitude], 15);
+      firstFix = false;
+      // A3 — after the first precise fix, downgrade to low-power tracking to save
+      // battery over a long night. The 5-min/75-m write throttle above is unchanged.
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      watchId = navigator.geolocation.watchPosition(onPos, onErr, { enableHighAccuracy: false, maximumAge: 60000, timeout: 30000 });
+    }
+  };
+  watchId = navigator.geolocation.watchPosition(onPos, onErr, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
 }
 
 // ---- "Alle anzeigen" ----
@@ -484,36 +620,118 @@ function venueWindow(v) {
   if (v.lineup && v.lineup.length) return { s: new Date(v.lineup[0].s).getTime(), e: new Date(v.lineup[v.lineup.length - 1].e).getTime() };
   return null;
 }
+// Merkt sich, welche Detail-Ansichten offen sind (überlebt das periodische Re-Render)
+const tlOpen = new Set();
+
+// Bucket einen Event in eine Festival-Session: "So 21." (Tag) oder "Sa-Nacht" (Abend/Nacht)
+function venueDay(ms) {
+  const hour = +new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hour12: false, timeZone: "Europe/Paris" }).format(new Date(ms));
+  const isNight = hour >= 20 || hour < 6;
+  // Sessions nach Mitternacht (00–06 Uhr) gehören zum vorherigen Abend
+  const key = (isNight && hour < 6) ? ms - 12 * 3600 * 1000 : ms;
+  const wd = fmtWeekday(key);
+  if (isNight) return `${wd} night`;
+  const day = new Intl.DateTimeFormat("en-GB", { day: "2-digit", timeZone: "Europe/Paris" }).format(new Date(key));
+  return `${wd} ${day}`;
+}
+
+// Öffnet Google Maps — direkt die App, wenn installiert (Universal/App Link), sonst Browser
+function gmapsUrl(v) {
+  const q = v.address ? encodeURIComponent(v.address) : `${v.lat},${v.lng}`;
+  return `https://www.google.com/maps/search/?api=1&query=${q}`;
+}
+
+function tlSetRows(v, now) {
+  if (!v.lineup || !v.lineup.length) return '<div class="tl-empty">Line-up to be announced</div>';
+  return v.lineup.map(sl => {
+    const s = new Date(sl.s).getTime(), e = new Date(sl.e).getTime();
+    const live = now >= s && now < e, past = now >= e, me = sl.me === true;
+    const cls = [live ? "now" : "", past ? "past" : "", me ? "me" : ""].filter(Boolean).join(" ");
+    const pill = me ? '<span class="mepill">YOUR SET</span>' : "";
+    return `<div class="tl-set ${cls}"><span class="st">${fmtTime(sl.s)}</span><span class="a">${escapeHtml(sl.act)}</span>${pill}</div>`;
+  }).join("");
+}
+
 function renderTimeline() {
   const now = Date.now();
+  // "+ Event" hinzufügen nur für Admins (Leroy & Amos)
+  document.getElementById("aeOpen").style.display = isAdmin() ? "" : "none";
   let items = allVenues().map(v => ({ v, w: venueWindow(v) })).filter(x => x.w).sort((a, b) => a.w.s - b.w.s);
   if (tlFavOnly) items = items.filter(x => isFav(x.v.id));
-  // Filter-Chip
-  const favCount = items.length;
   document.getElementById("tlFilter").innerHTML =
-    `<button id="tlFavToggle" class="tl-filter ${tlFavOnly ? "active" : ""}">${tlFavOnly ? "⭐ Nur Favoriten" : "Alle Events"}</button>`;
+    `<button id="tlFavToggle" class="tl-filter ${tlFavOnly ? "active" : ""}">${tlFavOnly ? "⭐ Favorites only" : "All events"}</button>`;
   document.getElementById("tlFavToggle").addEventListener("click", () => { tlFavOnly = !tlFavOnly; renderTimeline(); });
-  if (items.length === 0) { document.getElementById("tlList").innerHTML = '<div class="chat-empty">Noch keine Favoriten — tippe in einem Event auf ☆ Favorisieren.</div>'; return; }
-  const html = items.map(({ v, w }) => {
-    const live = now >= w.s && now < w.e, past = now >= w.e;
-    let badge;
-    if (live) badge = '<span class="tl-badge live">▶ LÄUFT</span>';
-    else if (past) badge = '<span class="tl-badge past">vorbei</span>';
-    else {
-      const mins = Math.round((w.s - now) / 60000);
-      const txt = mins < 60 ? `in ${mins} Min` : `in ${Math.round(mins / 60)} Std`;
-      badge = `<span class="tl-badge">${txt}</span>`;
-    }
-    const favIcon = isFav(v.id) ? ' <span class="tl-icon">⭐</span>' : "";
-    return `<div class="tl-row ${live ? "live" : ""} ${past ? "past" : ""} ${isFav(v.id) ? "fav" : ""}" data-vid="${v.id}">
-      <span class="tl-dot" style="background:${v.color}">${v.emoji}</span>
-      <span class="tl-mid"><span class="tl-name">${escapeHtml(v.name)}${favIcon}</span>
-      <span class="tl-time">${fmtWeekday(w.s)} ${fmtTime(new Date(w.s).toISOString())}–${fmtTime(new Date(w.e).toISOString())}</span></span>
-      ${badge}</div>`;
+  if (items.length === 0) { document.getElementById("tlList").innerHTML = '<div class="chat-empty">No favorites yet — tap ☆ Favorite on an event.</div>'; return; }
+
+  // "Jetzt live"-Streifen
+  const liveItems = items.filter(x => now >= x.w.s && now < x.w.e);
+  let strip = "";
+  if (liveItems.length && !tlFavOnly) {
+    const cards = liveItems.map(({ v }) => {
+      const cur = v.lineup && v.lineup.find(sl => now >= new Date(sl.s).getTime() && now < new Date(sl.e).getTime());
+      const me = cur && cur.me === true;
+      return `<div class="tl-lcard" data-jump="${v.id}">
+        <div class="v">${escapeHtml(v.name)}</div>
+        <div class="a ${me ? "me" : ""}">${cur ? escapeHtml(cur.act) : "live"}</div>
+        <div class="t">${cur ? fmtTime(cur.s) + "–" + fmtTime(cur.e) : ""}</div></div>`;
+    }).join("");
+    strip = `<div class="tl-live-hd"><span class="pulse"></span>Live now · ${liveItems.length} venues</div><div class="tl-live-cards">${cards}</div>`;
+  }
+
+  // Nach Tag-Sessions gruppieren (items sind chronologisch → Gruppen-Reihenfolge stimmt)
+  const groups = [];
+  const seen = {};
+  items.forEach(it => {
+    const key = venueDay(it.w.s);
+    if (!(key in seen)) { seen[key] = groups.length; groups.push({ key, rows: [] }); }
+    groups[seen[key]].rows.push(it);
+  });
+
+  const body = groups.map(g => {
+    const rows = g.rows.map(({ v, w }) => {
+      const live = now >= w.s && now < w.e, past = now >= w.e;
+      let badge;
+      if (live) badge = '<span class="tl-badge live">▶ LIVE</span>';
+      else if (past) badge = '<span class="tl-badge past">over</span>';
+      else {
+        const mins = Math.round((w.s - now) / 60000);
+        badge = `<span class="tl-badge">${mins < 60 ? `in ${mins} min` : `in ${Math.round(mins / 60)} h`}</span>`;
+      }
+      const favIcon = isFav(v.id) ? ' <span class="tl-icon">⭐</span>' : "";
+      const loc = `<div class="tl-loc">
+          <button class="tl-place" data-jump="${v.id}"><span class="pin">📍</span><span class="ad">${escapeHtml(v.address || "")}</span></button>
+          <a class="dir-btn" href="${gmapsUrl(v)}" target="_blank" rel="noopener" aria-label="Directions in Google Maps">${DIR_ICON}</a>
+        </div>`;
+      return `<div class="tl-row ${live ? "live" : ""} ${past ? "past" : ""} ${isFav(v.id) ? "fav" : ""} ${tlOpen.has(v.id) ? "open" : ""}" data-vid="${v.id}">
+        <div class="tl-head" data-toggle="${v.id}">
+          <span class="tl-dot" style="background:${v.color}">${v.emoji}</span>
+          <span class="tl-mid"><span class="tl-name">${escapeHtml(v.name)}${favIcon}</span>
+          <span class="tl-time">${fmtWeekday(w.s)} ${fmtTime(new Date(w.s).toISOString())}–${fmtTime(new Date(w.e).toISOString())}</span></span>
+          ${badge}<span class="tl-chev">▾</span>
+        </div>
+        <div class="tl-detail"><div class="tl-detail-inner">
+          ${loc}
+          ${tlSetRows(v, now)}
+        </div></div>
+      </div>`;
+    }).join("");
+    return `<div class="tl-day">${g.key}</div>${rows}`;
   }).join("");
-  document.getElementById("tlList").innerHTML = html;
-  document.querySelectorAll("#tlList .tl-row").forEach(row => row.addEventListener("click", () => {
-    const v = venueById(row.dataset.vid);
+
+  document.getElementById("tlList").innerHTML = strip + body;
+
+  // Kopf antippen → Detail auf/zu (Zustand merken)
+  document.querySelectorAll("#tlList .tl-head").forEach(head => head.addEventListener("click", () => {
+    const id = head.dataset.toggle;
+    const row = head.parentElement;
+    if (tlOpen.has(id)) { tlOpen.delete(id); row.classList.remove("open"); }
+    else { tlOpen.add(id); row.classList.add("open"); }
+  }));
+
+  // "Auf der Karte zeigen" + Live-Karten → zum Pin springen
+  document.querySelectorAll("#tlList [data-jump]").forEach(el => el.addEventListener("click", e => {
+    e.stopPropagation();
+    const v = venueById(el.dataset.jump);
     const m = v && venueMarkerById[v.id];
     closeSheets();
     if (v && m) { map.setView([v.lat, v.lng], 16); m.openPopup(); }
@@ -530,17 +748,17 @@ async function submitNewEvent() {
   const date = g("aeDate").value;
   const von = g("aeVon").value, bis = g("aeBis").value;
   const msg = g("aeMsg");
-  if (!name || !addr || !date || !von || !bis) { msg.textContent = "Bitte Name, Adresse, Datum und Zeiten ausfüllen."; return; }
-  if (!sb) { msg.textContent = "Keine Verbindung."; return; }
-  msg.style.color = "#888"; msg.textContent = "Suche Adresse…";
+  if (!name || !addr || !date || !von || !bis) { msg.textContent = "Please fill in name, address, date and times."; return; }
+  if (!sb) { msg.textContent = "No connection."; return; }
+  msg.style.color = "#888"; msg.textContent = "Searching address…";
   let lat, lng;
   try {
     const q = /paris/i.test(addr) ? addr : addr + ", Paris, France";
     const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`, { headers: { Accept: "application/json" } });
     const arr = await r.json();
-    if (!arr || !arr.length) { msg.style.color = "#c34254"; msg.textContent = "Adresse nicht gefunden — genauer angeben (Straße + Nr.)."; return; }
+    if (!arr || !arr.length) { msg.style.color = "#c34254"; msg.textContent = "Address not found — be more specific (street + no.)."; return; }
     lat = parseFloat(arr[0].lat); lng = parseFloat(arr[0].lon);
-  } catch (e) { msg.style.color = "#c34254"; msg.textContent = "Adresssuche fehlgeschlagen. Nochmal versuchen."; return; }
+  } catch (e) { msg.style.color = "#c34254"; msg.textContent = "Address search failed. Try again."; return; }
 
   const startIso = `${date}T${von}:00+02:00`;
   const endIso = `${(bis <= von ? addDayStr(date) : date)}T${bis}:00+02:00`;
@@ -558,8 +776,8 @@ async function submitNewEvent() {
     ["aeName", "aeAddr", "aeAct", "aeActVon", "aeActBis"].forEach(i => g(i).value = "");
     msg.textContent = "";
     closeSheets();
-    toast("✅ Event hinzugefügt — bei allen sichtbar!");
-  } catch (e) { msg.style.color = "#c34254"; msg.textContent = "Speichern fehlgeschlagen."; }
+    toast("✅ Event added — visible to everyone!");
+  } catch (e) { msg.style.color = "#c34254"; msg.textContent = "Saving failed."; }
 }
 
 // ---- Crew-Liste ----
@@ -574,21 +792,23 @@ function renderCrewList() {
     if (b.uid === USER_ID) return 1;
     return (b.online - a.online) || ((b.u.ts || 0) - (a.u.ts || 0));
   });
-  if (users.length === 0) { wrap.innerHTML = '<div class="chat-empty">Noch keine Crew online — bitte deinen Freunden den Link schicken!</div>'; return; }
-  const isAdmin = ["leroy", "amos"].includes((userName || "").trim().toLowerCase());
+  if (users.length === 0) { wrap.innerHTML = '<div class="chat-empty">No crew online yet — send your friends the link!</div>'; return; }
+  const admin = isAdmin();
   wrap.innerHTML = users.map(({ uid, u, online }) => {
     const isMe = uid === USER_ID;
     const color = isMe ? "#2b7fff" : colorForUid(uid);
     const st = statusOf(u.status);
     const mins = Math.round((Date.now() - (u.ts || 0)) / 60000);
-    const seen = mins <= 0 ? "gerade eben" : (mins === 1 ? "vor 1 Min" : (mins < 60 ? `vor ${mins} Min` : `vor ${Math.round(mins / 60)} Std`));
-    const sub = isMe ? "Du" : (online ? (st ? `${st.emoji} ${st.label}` : `📡 ${seen}`) : `🔴 zuletzt ${seen}`);
+    const seen = mins <= 0 ? "just now" : (mins === 1 ? "1 min ago" : (mins < 60 ? `${mins} min ago` : `${Math.round(mins / 60)} h ago`));
+    const atV = venueForMember(u); // B — "at NUU" when within a venue radius
+    const sub = atV ? `📍 at ${atV.name}`
+      : (isMe ? "You" : (online ? (st ? `${st.emoji} ${st.label}` : `📡 ${seen}`) : `🔴 last seen ${seen}`));
     const dot = (u.photo
       ? `<span class="crew-dot photo" style="background-image:url('${u.photo}')"></span>`
       : `<span class="crew-dot" style="background:${color}"></span>`) + `<span class="crew-online ${online ? 'on' : 'off'}"></span>`;
-    const adminDel = (isAdmin && !isMe) ? `<button class="crew-del" data-uid="${uid}" data-name="${escapeHtml(u.name || "?")}">🗑</button>` : "";
+    const adminDel = (admin && !isMe) ? `<button class="crew-del" data-uid="${uid}" data-name="${escapeHtml(u.name || "?")}">🗑</button>` : "";
     return `<div class="crew-row" data-uid="${uid}"><div class="crew-avatar">${dot}</div>` +
-           `<div class="crew-mid"><div class="crew-name">${escapeHtml(u.name || "?")}${isMe ? ' <span class="crew-me">(du)</span>' : ''}</div><div class="crew-sub">${escapeHtml(sub)}</div></div>` +
+           `<div class="crew-mid"><div class="crew-name">${escapeHtml(u.name || "?")}${isMe ? ' <span class="crew-me">(you)</span>' : ''}</div><div class="crew-sub">${escapeHtml(sub)}</div></div>` +
            `${adminDel}<button class="crew-go">📍</button></div>`;
   }).join("");
   wrap.querySelectorAll(".crew-row").forEach(row => row.addEventListener("click", () => {
@@ -600,26 +820,33 @@ function renderCrewList() {
   wrap.querySelectorAll(".crew-del").forEach(btn => btn.addEventListener("click", async e => {
     e.stopPropagation();
     const uid = btn.dataset.uid;
-    if (sb && confirm(`Account „${btn.dataset.name}" wirklich löschen?`)) {
+    if (sb && confirm(`Delete account “${btn.dataset.name}”?`)) {
       try {
         await sb.from("push_subscriptions").delete().eq("uid", uid);
         await sb.from("members").delete().eq("id", uid);
         delete friendData[uid]; renderFriends(friendData);
-        toast("🗑 Account gelöscht");
-      } catch (err) { toast("Fehler: " + (err && err.message ? err.message : err)); }
+        toast("🗑 Account deleted");
+      } catch (err) { toast("Error: " + (err && err.message ? err.message : err)); }
     }
   }));
 }
 
 // ---- Sheets (Programm / Status) ----
-function closeSheets() { document.querySelectorAll(".sheet").forEach(s => s.classList.add("hidden")); chatOpen = false; }
-function openSheet(id) { closeSheets(); document.getElementById(id).classList.remove("hidden"); }
+// Highlight the bottom-bar tab whose sheet is open (null = none, back on the map)
+const TAB_FOR_SHEET = { timeline: "programBtn", crewSheet: "crewBtn", chatSheet: "chatBtn", statusSheet: "statusBtn" };
+function setActiveTab(sheetId) {
+  document.querySelectorAll("#bottomBar .tab").forEach(t => t.classList.remove("active"));
+  const id = TAB_FOR_SHEET[sheetId];
+  if (id) document.getElementById(id).classList.add("active");
+}
+function closeSheets() { document.querySelectorAll(".sheet").forEach(s => s.classList.add("hidden")); chatOpen = false; setActiveTab(null); }
+function openSheet(id) { closeSheets(); document.getElementById(id).classList.remove("hidden"); setActiveTab(id); }
 
 // ---- Status-Picker ----
 function renderStatusOptions() {
   const wrap = document.getElementById("stOptions");
   wrap.innerHTML = STATUSES.map(s => `<button class="st-opt ${myStatus === s.key ? "active" : ""}" data-key="${s.key}">${s.emoji} ${s.label}</button>`).join("")
-    + `<button class="st-opt clear" data-key="">✖️ Status entfernen</button>`;
+    + `<button class="st-opt clear" data-key="">✖️ Clear status</button>`;
   wrap.querySelectorAll(".st-opt").forEach(b => b.addEventListener("click", () => {
     myStatus = b.dataset.key || null;
     if (myStatus) localStorage.setItem("plm_status", myStatus); else localStorage.removeItem("plm_status");
@@ -629,11 +856,20 @@ function renderStatusOptions() {
 }
 
 // ---- Push (Web-Push via VAPID) ----
-function updatePushBtn() {
+async function updatePushBtn() {
   const b = document.getElementById("pushBtn");
   if (!b) return;
-  if (localStorage.getItem("plm_push")) { b.textContent = "🔔 Push aktiv ✓"; b.classList.add("active"); }
-  else { b.textContent = "🔔 Push-Benachrichtigungen aktivieren"; b.classList.remove("active"); }
+  // A4 — reconcile the stored flag against the REAL subscription so we never show
+  // "Push on" when iOS/the browser has silently dropped the subscription.
+  if (localStorage.getItem("plm_push") && "serviceWorker" in navigator) {
+    try {
+      const reg = await navigator.serviceWorker.getRegistration();
+      const sub = reg && await reg.pushManager.getSubscription();
+      if (!sub) localStorage.removeItem("plm_push");
+    } catch (e) { /* keep last-known state */ }
+  }
+  if (localStorage.getItem("plm_push")) { b.textContent = "🔔 Push on ✓"; b.classList.add("active"); }
+  else { b.textContent = "🔔 Enable push notifications"; b.classList.remove("active"); }
 }
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -649,24 +885,24 @@ async function enablePush(mode) {
   const fail = (msg) => { if (loud) alert("🔔 " + msg); };
 
   if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
-    fail("Benachrichtigungen gehen nur über das Home-Bildschirm-Icon."); return;
+    fail("Notifications only work via the Home Screen icon."); return;
   }
   const vapid = window.__VAPID_PUBLIC;
-  if (!vapid) { fail("Push ist noch nicht konfiguriert."); return; }
+  if (!vapid) { fail("Push isn’t configured yet."); return; }
   try {
     const reg = await navigator.serviceWorker.register("sw.js");
     await navigator.serviceWorker.ready;
     const perm = await Notification.requestPermission();
-    if (perm !== "granted") { fail("Bitte erlaube Benachrichtigungen (iPhone-Einstellungen → FDLM Live → Mitteilungen)."); return; }
+    if (perm !== "granted") { fail("Please allow notifications (iPhone Settings → FDLM Live → Notifications)."); return; }
     let sub = await reg.pushManager.getSubscription();
     if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(vapid) });
     const { error } = await sb.from("push_subscriptions").upsert({ uid: USER_ID, subscription: sub.toJSON() });
-    if (error) { fail("Konnte Push nicht speichern."); return; }
+    if (error) { fail("Couldn’t save push."); return; }
     localStorage.setItem("plm_push", "1");
     updatePushBtn();
-    if (loud) alert("🔔 Push aktiviert! ✓");
+    if (loud) alert("🔔 Push enabled! ✓");
   } catch (e) {
-    if (loud) alert("🔔 Push-Fehler: " + (e && e.message ? e.message : e));
+    if (loud) alert("🔔 Push error: " + (e && e.message ? e.message : e));
   }
 }
 
@@ -698,7 +934,7 @@ function checkReminders() {
     const w = venueWindow(v);
     if (!w) return;
     const mins = (w.s - now) / 60000;
-    if (mins <= 30 && mins > 0) fireReminder("fav_" + v.id, "⭐ Bald dein Stop!", `In ${Math.round(mins)} Min: ${v.name} startet`);
+    if (mins <= 30 && mins > 0) fireReminder("fav_" + v.id, "⭐ Your stop is coming up!", `In ${Math.round(mins)} min: ${v.name} starts`);
   });
 }
 
@@ -723,9 +959,9 @@ async function loadChannel(ch) {
   (data || []).forEach(r => addMsg(st, { id: r.id, uid: r.uid, name: r.name, text: r.text, ts: Date.parse(r.created_at) }));
 }
 function notifyMessage(ch, m) {
-  const label = ch === "crew" ? "Crew-Chat" : `${m.name || "Freund"} (privat)`;
-  const body = ch === "crew" ? `${m.name || "Freund"}: ${m.text}` : m.text;
-  toast(`💬 ${m.name || "Freund"}: ${m.text}`);
+  const label = ch === "crew" ? "Crew Chat" : `${m.name || "Friend"} (private)`;
+  const body = ch === "crew" ? `${m.name || "Friend"}: ${m.text}` : m.text;
+  toast(`💬 ${m.name || "Friend"}: ${m.text}`);
   // System-Notification nur, wenn KEIN echter Push aktiv ist (sonst kommt der Push vom Server → Doppel vermeiden)
   if (!localStorage.getItem("plm_push") && "Notification" in window && Notification.permission === "granted") {
     try { new Notification("💬 " + label, { body, icon: "icon-192.png", tag: "chat_" + ch, renotify: true }); } catch (e) {}
@@ -739,31 +975,31 @@ function setupChat() {
   if (chatInited || !sb) return;
   chatInited = true;
   ensureChannel("crew", "Crew");
-  // EINE Realtime-Subscription für alle neuen Nachrichten, danach Routing nach Channel.
-  // Findet auch DMs, die jemand ZUERST an mich schickt.
-  sb.channel("messages-rt")
-    .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, ({ new: r }) => {
-      const ch = r.channel;
-      if (!isMyChannel(ch)) return;
-      if (!channelState[ch]) {
-        const other = ch.startsWith("dm:") ? otherFromDmChannel(ch) : null;
-        const nm = (other && friendData[other] && friendData[other].name) || "Freund";
-        ensureChannel(ch, nm);
-      }
-      const st = channelState[ch];
-      const msg = { id: r.id, uid: r.uid, name: r.name, text: r.text, ts: Date.parse(r.created_at) };
-      if (!addMsg(st, msg)) { renderChannelTabs(); return; }
-      if (ch.startsWith("dm:") && r.uid !== USER_ID && r.name) st.name = r.name;
-      if (activeChannel === ch && chatOpen) {
-        const empty = document.querySelector("#chList .chat-empty");
-        if (empty) document.getElementById("chList").innerHTML = "";
-        appendMessage(msg);
-        const l = document.getElementById("chList"); l.scrollTop = l.scrollHeight;
-      }
-      const viewingThis = chatOpen && activeChannel === ch && !document.hidden;
-      if (r.uid !== USER_ID && !viewingThis) { st.unread++; updateChatBadge(); notifyMessage(ch, msg); }
-      renderChannelTabs();
-    }).subscribe();
+  // The messages-rt subscription itself is created in subscribeRealtime() so it shares
+  // the reconnect path. The handler below also catches DMs someone sends to me FIRST.
+}
+// Handler for every new message (routed by channel). Extracted so subscribeRealtime reuses it.
+function onMessageInsert({ new: r }) {
+  const ch = r.channel;
+  if (!isMyChannel(ch)) return;
+  if (!channelState[ch]) {
+    const other = ch.startsWith("dm:") ? otherFromDmChannel(ch) : null;
+    const nm = (other && friendData[other] && friendData[other].name) || "Friend";
+    ensureChannel(ch, nm);
+  }
+  const st = channelState[ch];
+  const msg = { id: r.id, uid: r.uid, name: r.name, text: r.text, ts: Date.parse(r.created_at) };
+  if (!addMsg(st, msg)) { renderChannelTabs(); return; }
+  if (ch.startsWith("dm:") && r.uid !== USER_ID && r.name) st.name = r.name;
+  if (activeChannel === ch && chatOpen) {
+    const empty = document.querySelector("#chList .chat-empty");
+    if (empty) document.getElementById("chList").innerHTML = "";
+    appendMessage(msg);
+    const l = document.getElementById("chList"); l.scrollTop = l.scrollHeight;
+  }
+  const viewingThis = chatOpen && activeChannel === ch && !document.hidden;
+  if (r.uid !== USER_ID && !viewingThis) { st.unread++; updateChatBadge(); notifyMessage(ch, msg); }
+  renderChannelTabs();
 }
 function appendMessage(m) {
   const listEl = document.getElementById("chList");
@@ -787,23 +1023,23 @@ async function openChannel(ch, name) {
   ensureChannel(ch, name);
   activeChannel = ch;
   const listEl = document.getElementById("chList");
-  listEl.innerHTML = `<div class="chat-empty">Lädt…</div>`;
+  listEl.innerHTML = `<div class="chat-empty">Loading…</div>`;
   await loadChannel(ch);
   channelState[ch].unread = 0;
   updateChatBadge();
   listEl.innerHTML = "";
   const msgs = channelState[ch].messages;
   if (msgs.length === 0) {
-    listEl.innerHTML = `<div class="chat-empty">${ch === "crew" ? "Noch keine Nachrichten — schreib der Crew! 👋" : "Noch keine Nachrichten in diesem privaten Chat 🔒"}</div>`;
+    listEl.innerHTML = `<div class="chat-empty">${ch === "crew" ? "No messages yet — say hi to the crew! 👋" : "No messages in this private chat yet 🔒"}</div>`;
   } else {
     msgs.forEach(appendMessage);
   }
   const dispName = name || channelState[ch].name;
   const inp = document.getElementById("chInput");
-  inp.placeholder = ch === "crew" ? "Nachricht an die Crew…" : `Privat an ${dispName}…`;
+  inp.placeholder = ch === "crew" ? "Message the crew…" : `Private to ${dispName}…`;
   renderChannelTabs();
   setTimeout(() => { listEl.scrollTop = listEl.scrollHeight; }, 30);
-  document.getElementById("chatTitle").textContent = ch === "crew" ? "💬 Crew-Chat" : "🔒 Privat · " + dispName;
+  document.getElementById("chatTitle").textContent = ch === "crew" ? "💬 Crew Chat" : "🔒 Private · " + dispName;
 }
 function renderChannelTabs() {
   const wrap = document.getElementById("chTabs");
@@ -828,7 +1064,7 @@ async function sendChat() {
   inp.value = "";
   const ch = activeChannel;
   const { error } = await sb.from("messages").insert({ channel: ch, uid: USER_ID, name: userName || "?", text });
-  if (error) { toast("Senden fehlgeschlagen"); inp.value = text; return; }
+  if (error) { toast("Send failed"); inp.value = text; return; }
   if (ch === "crew") triggerPush("crew", null, text);
   else if (ch.startsWith("dm:")) triggerPush("dm", otherFromDmChannel(ch), text);
 }
@@ -859,10 +1095,18 @@ function begin() {
   // Beim ersten Mal nicht-silent (zeigt Prompt + Erfolg/Fehler), danach still erneuern.
   enablePush("auto").catch(() => {});
   checkReminders();
+  lastBeat = Date.now();
   setInterval(() => {
     updateNextSet(); checkReminders();
-    renderFriends(friendData); // Online/Offline zeitbasiert neu berechnen
+    renderFriends(friendData); // re-evaluate online/offline by time
+    // A2 — presence keepalive: a motionless person stops writing and would silently
+    // drop to "offline" after 45 min. Beat at most every ~4 min to stay honest.
+    const now = Date.now();
+    if (userName && now - lastBeat > 4 * 60 * 1000) { lastBeat = now; upsertMe(); }
   }, 30000);
+  // A1 — recover the live socket when the app returns to the foreground / regains network.
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) resync("visible"); });
+  window.addEventListener("online", () => resync("online"));
 }
 
 // ---- Foto/Avatar beim Namen-Setup ----
@@ -931,7 +1175,7 @@ document.addEventListener("click", e => {
     const id = fb.dataset.vid;
     toggleFav(id);
     const f = isFav(id);
-    fb.textContent = f ? "⭐ Favorit" : "☆ Favorisieren";
+    fb.textContent = f ? "⭐ Favorite" : "☆ Add favorite";
     fb.classList.toggle("active", f);
     const v = venueById(id);
     if (venueMarkerById[id] && v) venueMarkerById[id].setIcon(venueIcon(v));
@@ -940,7 +1184,7 @@ document.addEventListener("click", e => {
   const del = e.target.closest(".del-event-btn");
   if (del) {
     const id = del.dataset.vid;
-    if (confirm("Dieses Event wirklich für alle löschen?") && sb) {
+    if (confirm("Delete this event for everyone?") && sb) {
       sb.from("events").delete().eq("id", id);
       map.closePopup();
     }
@@ -953,7 +1197,7 @@ document.getElementById("chInput").addEventListener("keydown", e => { if (e.key 
 const hideBtn = document.getElementById("hideBtn");
 hideBtn.addEventListener("click", () => {
   visible = !visible;
-  hideBtn.textContent = visible ? "Sichtbar" : "Versteckt";
+  hideBtn.textContent = visible ? "Visible" : "Hidden";
   hideBtn.classList.toggle("ghost", !visible);
   upsertMe();
 });

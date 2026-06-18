@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>FDLM Live</title>
@@ -17,6 +17,7 @@
   <!-- Leaflet (Karte) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.gridlayer.googlemutant@0.14.1/dist/Leaflet.GoogleMutant.js"></script>
 
   <!-- Supabase (Live-Sync via Realtime) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -30,6 +31,9 @@
     * { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; background: #190c0d; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     #map { position: fixed; inset: 0; height: 100%; background: #e8e6e1; z-index: 0; }
+    /* Leaflet-Controls (Zoom +/- links, Karten/Satellit rechts) unter die Topbar schieben
+       und über sie legen — sonst fängt die Topbar die Klicks ab */
+    .leaflet-top { top: calc(64px + env(safe-area-inset-top)); z-index: 1100; }
 
     /* Top bar */
     #topbar {
@@ -122,10 +126,11 @@
     .leaflet-popup-content { margin: 12px 14px; font-size: 14px; }
     .leaflet-popup-content b { font-size: 15px; }
     .leaflet-popup-content .route-btn {
-      display: inline-block; margin-top: 8px; padding: 8px 14px;
-      background: var(--accent); color: #fff; border-radius: 999px;
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 8px 14px 8px 10px;
+      background: #1a73e8; color: #fff; border-radius: 999px;
       text-decoration: none; font-weight: 600; font-size: 13px;
     }
+    .leaflet-popup-content .route-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
     .leaflet-popup-content .sub { color: #666; font-size: 12px; margin-top: 2px; }
     .leaflet-popup-content .dist { margin-top: 6px; font-size: 12.5px; color: #c34254; font-weight: 600; }
     .venue-popup .lineup {
@@ -150,7 +155,7 @@
     .friend-popup .sub { color: #666; font-size: 12px; margin-top: 2px; }
 
     #status {
-      position: fixed; bottom: calc(70px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+      position: fixed; bottom: calc(80px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
       z-index: 1000; background: rgba(25,12,13,.9); color: #fff;
       padding: 7px 15px; border-radius: 999px; font-size: 12.5px;
       max-width: 90%; text-align: center;
@@ -165,17 +170,27 @@
       box-shadow: 0 1px 3px rgba(0,0,0,.35);
     }
 
-    /* Bottom-Bar */
+    /* Bottom-Bar — floating frosted pill (Apple-style) */
     #bottomBar {
-      position: fixed; bottom: calc(14px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
-      z-index: 1001; display: flex; gap: 10px;
+      position: fixed; left: 50%; transform: translateX(-50%);
+      bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 1001;
+      display: flex; align-items: center; gap: 2px; padding: 6px 8px;
+      background: rgba(255, 255, 255, .72);
+      -webkit-backdrop-filter: saturate(180%) blur(22px);
+      backdrop-filter: saturate(180%) blur(22px);
+      border-radius: 28px; border: 0.5px solid rgba(0, 0, 0, .07);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .16), 0 2px 6px rgba(0, 0, 0, .08);
     }
-    #bottomBar button {
-      border: 0; border-radius: 999px; padding: 11px 18px;
-      font-size: 14px; font-weight: 700; cursor: pointer;
-      background: var(--bg); color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.35);
-      border: 1px solid rgba(255,255,255,.12);
+    #bottomBar .tab {
+      position: relative; width: 70px; border: 0; background: none; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 6px 0 5px; border-radius: 18px; color: #8a8a8e; font-weight: 600;
+      -webkit-tap-highlight-color: transparent; transition: background .15s, color .15s, transform .08s;
     }
+    #bottomBar .tab .ic { position: relative; font-size: 22px; line-height: 1; }
+    #bottomBar .tab .lb { font-size: 10.5px; letter-spacing: .005em; }
+    #bottomBar .tab.active { color: var(--accent); background: rgba(195, 66, 84, .12); }
+    #bottomBar .tab:active { transform: scale(.94); }
 
     /* Toast */
     #toast {
@@ -203,18 +218,61 @@
     .sheet-head button { border: 0; background: #eee; border-radius: 50%; width: 30px; height: 30px; font-size: 14px; cursor: pointer; }
 
     #tlList { overflow-y: auto; padding: 0 14px calc(16px + env(safe-area-inset-bottom)); }
-    .tl-row {
-      display: flex; align-items: center; gap: 12px; padding: 12px 8px;
-      border-bottom: 1px solid #f0f0f0; cursor: pointer;
-    }
-    .tl-row.past { opacity: .45; }
-    .tl-row.live { background: #fff5f6; border-radius: 12px; }
+
+    /* Tag-Gruppen-Überschrift */
+    .tl-day { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #b4a5a1; margin: 16px 4px 4px; }
+
+    /* "Jetzt live"-Streifen */
+    .tl-live-hd { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 6px 4px 9px; }
+    .tl-live-hd .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: tlpulse 1.8s infinite; }
+    @keyframes tlpulse { 0% { box-shadow: 0 0 0 0 rgba(195,66,84,.5); } 70% { box-shadow: 0 0 0 8px rgba(195,66,84,0); } 100% { box-shadow: 0 0 0 0 rgba(195,66,84,0); } }
+    .tl-live-cards { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
+    .tl-live-cards::-webkit-scrollbar { display: none; }
+    .tl-lcard { flex: 0 0 auto; width: 152px; background: #fff; border: 1px solid #f1dadd; border-left: 3px solid var(--accent); border-radius: 12px; padding: 10px 12px; cursor: pointer; }
+    .tl-lcard .v { font-size: 12px; font-weight: 700; color: #190c0d; line-height: 1.15; }
+    .tl-lcard .a { font-size: 14px; font-weight: 700; color: #190c0d; margin-top: 4px; }
+    .tl-lcard .a.me { color: #8a6d00; }
+    .tl-lcard .t { font-size: 11px; color: #999; margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+    /* Zeile (Container + klickbarer Kopf) */
+    .tl-row { border-bottom: 1px solid #f0f0f0; }
+    .tl-row.live { background: #fff5f6; border-radius: 12px; border-bottom-color: transparent; }
+    .tl-row.fav { background: #fffbe6; border-radius: 12px; border-bottom-color: transparent; }
+    .tl-row.past .tl-head { opacity: .45; }
+    .tl-head { display: flex; align-items: center; gap: 12px; padding: 12px 8px; cursor: pointer; }
     .tl-dot { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
     .tl-mid { display: flex; flex-direction: column; flex: 1; min-width: 0; }
     .tl-name { font-weight: 700; font-size: 14.5px; color: #190c0d; }
     .tl-time { font-size: 12.5px; color: #888; font-variant-numeric: tabular-nums; }
     .tl-star, .tl-icon { font-size: 12px; }
-    .tl-row.fav { background: #fffbe6; border-radius: 12px; }
+    .tl-chev { font-size: 10px; color: #c0b3b0; margin-left: 6px; transition: transform .2s; }
+    .tl-row.open .tl-chev { transform: rotate(180deg); }
+
+    /* Detail-Ansicht (Line-up + Location) */
+    .tl-detail { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
+    .tl-row.open .tl-detail { max-height: 1400px; }
+    .tl-detail-inner { padding: 2px 10px 14px 14px; }
+    .tl-set { display: flex; align-items: baseline; gap: 12px; padding: 5px 0; }
+    .tl-set .st { font-size: 12px; color: #999; width: 44px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+    .tl-set .a { font-size: 14px; color: #555; flex: 1; }
+    .tl-set.now .a { color: var(--accent); font-weight: 700; }
+    .tl-set.now .st { color: var(--accent); }
+    .tl-set.me .a { color: #190c0d; font-weight: 800; }
+    .tl-set .mepill { font-size: 10px; font-weight: 800; background: #190c0d; color: #fff; padding: 2px 7px; border-radius: 5px; }
+    .tl-set.past { opacity: .4; }
+    .tl-empty { font-size: 13px; color: #aaa; padding: 4px 0; }
+
+    /* Ortszeile: Emoji + Adresse → In-App-Karte, Wegweiser → Google Maps */
+    .tl-loc { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; padding: 4px 2px 12px; border-bottom: 1px solid #e9e2e3; }
+    .tl-place { flex: 1; min-width: 0; display: flex; align-items: center; gap: 9px; border: 0; background: none; padding: 5px 3px; border-radius: 9px; cursor: pointer; text-align: left; color: #190c0d; -webkit-tap-highlight-color: transparent; }
+    .tl-place:active { background: #f0eeed; }
+    .tl-place .pin { font-size: 17px; flex-shrink: 0; }
+    .tl-place .ad { font-size: 13.5px; font-weight: 600; line-height: 1.3; }
+    /* Wegweiser-Button → Google Maps (gleiches Design wie Google) */
+    .dir-btn { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: #1a73e8; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 5px rgba(26,115,232,.5); text-decoration: none; }
+    .dir-btn:active { background: #1666cc; }
+    .dir-btn svg { width: 20px; height: 20px; }
+
     #tlFilter { padding: 2px 14px 8px; flex-shrink: 0; }
     .tl-filter { border: 1px solid #e5d28a; background: #fff8e1; color: #8a6d00; border-radius: 999px; padding: 7px 16px; font-size: 13px; font-weight: 700; cursor: pointer; }
     .tl-filter.active { background: #ffd591; border-color: #f0b429; }
@@ -225,6 +283,23 @@
       transform: rotate(45deg);
     }
     .venue-pin.fav { box-shadow: 0 0 0 3px #ffd591, 0 2px 6px rgba(0,0,0,.4); }
+
+    /* Crew-count badge on the venue pin (B) — dark brand chip, mirrors fav-badge rotation */
+    .venue-pin .crew-count {
+      position: absolute; top: -9px; left: -9px;
+      min-width: 18px; height: 18px; padding: 0 4px;
+      background: #190c0d; color: #fff; border: 1.5px solid #fff;
+      border-radius: 9px; font-size: 11px; font-weight: 700; line-height: 15px;
+      text-align: center; transform: rotate(45deg);
+      box-shadow: 0 1px 3px rgba(0,0,0,.35);
+    }
+    /* "Who's here" list in the venue popup (B) — reuses the popup's muted styling */
+    .venue-popup .here-list { margin-top: 9px; border-top: 1px solid #eee; padding-top: 7px; }
+    .venue-popup .here-hd { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #9a8f8c; margin-bottom: 5px; }
+    .venue-popup .here-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; font-size: 13px; color: #222; }
+    .venue-popup .here-row.off { opacity: .5; }
+    .venue-popup .here-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.12); background-size: cover; background-position: center; flex-shrink: 0; }
+    .venue-popup .here-you { color: #999; font-size: 11px; }
 
     /* Favoriten-Button im Popup */
     .venue-popup .fav-btn {
@@ -262,36 +337,42 @@
     #aeMsg { font-size: 13px; color: #c34254; text-align: center; min-height: 18px; }
     .venue-popup .del-event-btn { display: block; width: 100%; margin-top: 8px; padding: 8px; background: #fff0f0; color: #c92a2a; border: 1px solid #ffc9c9; border-radius: 999px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
 
-    /* Chat-Badge am Button */
-    #chatBtn { position: relative; }
+    /* Chat-Badge am Icon */
     #chatBadge {
-      display: none; position: absolute; top: -5px; right: -5px;
-      min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
-      background: var(--accent); color: #fff; font-size: 11px; font-weight: 800;
-      line-height: 18px; text-align: center; border: 2px solid var(--bg);
+      display: none; position: absolute; top: -6px; right: -12px;
+      min-width: 17px; height: 17px; padding: 0 5px; border-radius: 999px;
+      background: var(--accent); color: #fff; font-size: 10.5px; font-weight: 800;
+      line-height: 17px; text-align: center; border: 1.5px solid rgba(249,247,246,1);
     }
     #chatBadge.show { display: block; }
 
     /* Chat-Sheet */
     #chatSheet { height: 80%; max-height: 80%; }
-    #chList { flex: 1; overflow-y: auto; padding: 6px 14px 10px; display: flex; flex-direction: column; gap: 8px; }
+    #chList { flex: 1; overflow-y: auto; padding: 10px 14px 12px; display: flex; flex-direction: column; gap: 3px; }
     .chat-empty { text-align: center; color: #aaa; font-size: 13px; padding: 24px; }
-    .msg { max-width: 78%; display: flex; flex-direction: column; }
-    .msg .who { font-size: 11px; font-weight: 700; color: #888; margin: 0 0 2px 10px; }
+    .msg { max-width: 76%; display: flex; flex-direction: column; margin-top: 9px; }
+    .msg + .msg.theirs, .msg + .msg.mine { margin-top: 9px; }
+    .msg .who { font-size: 11.5px; font-weight: 700; color: #9a9a9f; margin: 0 0 3px 12px; }
     .msg .bubble {
-      padding: 9px 13px; border-radius: 16px; font-size: 14.5px; line-height: 1.35;
-      background: #f0f0f2; color: #190c0d; word-wrap: break-word; overflow-wrap: anywhere;
+      padding: 10px 15px; border-radius: 20px; font-size: 15px; line-height: 1.34;
+      background: #ebebee; color: #190c0d; word-wrap: break-word; overflow-wrap: anywhere;
     }
-    .msg .time { font-size: 10px; color: #b0b0b0; margin: 2px 0 0 10px; }
+    .msg .time { font-size: 10px; color: #b6b6ba; margin: 3px 0 0 12px; }
     .msg.mine { align-self: flex-end; align-items: flex-end; }
-    .msg.mine .bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 5px; }
-    .msg.mine .time, .msg.mine .who { margin-left: 0; margin-right: 10px; }
-    .msg.theirs .bubble { border-bottom-left-radius: 5px; }
+    .msg.mine .bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 6px; }
+    .msg.mine .time, .msg.mine .who { margin-left: 0; margin-right: 12px; }
+    .msg.theirs .bubble { border-bottom-left-radius: 6px; }
 
-    #chInputBar { display: flex; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid #eee; background: #fff; }
-    #chInput { flex: 1; border: 1px solid #ddd; border-radius: 999px; padding: 12px 16px; font-size: 15px; outline: none; }
-    #chInput:focus { border-color: var(--accent); }
-    #chSend { border: 0; border-radius: 999px; padding: 0 18px; font-size: 14px; font-weight: 700; background: var(--accent); color: #fff; cursor: pointer; }
+    #chInputBar { display: flex; gap: 9px; align-items: center; padding: 9px 12px calc(9px + env(safe-area-inset-bottom)); border-top: 1px solid #eee; background: #fff; }
+    #chInput { flex: 1; border: 1px solid #dedede; border-radius: 999px; padding: 12px 17px; font-size: 15.5px; outline: none; background: #f7f7f8; }
+    #chInput:focus { border-color: var(--accent); background: #fff; }
+    #chSend {
+      flex-shrink: 0; width: 42px; height: 42px; border: 0; border-radius: 50%;
+      background: var(--accent); color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 10px rgba(195,66,84,.4); transition: transform .08s;
+    }
+    #chSend:active { transform: scale(.9); }
 
     /* Chat-Tabs */
     #chTabs {
@@ -304,7 +385,7 @@
       padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
       cursor: pointer; white-space: nowrap; color: #555;
     }
-    .ch-tab.active { background: var(--bg); color: #fff; border-color: var(--bg); }
+    .ch-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
     .tab-badge {
       display: inline-block; min-width: 16px; height: 16px; padding: 0 5px;
       margin-left: 6px; border-radius: 999px; background: var(--accent); color: #fff;
@@ -366,105 +447,105 @@
   <div id="topbar">
     <div class="title">📍 FDLM Live</div>
     <div class="spacer"></div>
-    <button id="allBtn" class="ghost">Alle</button>
-    <button id="recenterBtn" class="ghost">Mich</button>
-    <button id="hideBtn">Sichtbar</button>
+    <button id="allBtn" class="ghost">All</button>
+    <button id="recenterBtn" class="ghost">Me</button>
+    <button id="hideBtn">Visible</button>
   </div>
 
   <div id="nextSet"></div>
 
-  <div id="status">Starte…</div>
+  <div id="status">Starting…</div>
 
   <div id="bottomBar">
-    <button id="programBtn">📋 Programm</button>
-    <button id="crewBtn">👥 Crew</button>
-    <button id="chatBtn">💬 Chat<span id="chatBadge"></span></button>
-    <button id="statusBtn">🙋 Status</button>
+    <button id="programBtn" class="tab"><span class="ic">📋</span><span class="lb">Schedule</span></button>
+    <button id="crewBtn" class="tab"><span class="ic">👥</span><span class="lb">Crew</span></button>
+    <button id="chatBtn" class="tab"><span class="ic">💬<span id="chatBadge"></span></span><span class="lb">Chat</span></button>
+    <button id="statusBtn" class="tab"><span class="ic">🙋</span><span class="lb">Status</span></button>
   </div>
 
   <div id="toast"></div>
 
-  <!-- Programm-Timeline -->
+  <!-- Schedule timeline -->
   <div id="timeline" class="sheet hidden">
-    <div class="sheet-head"><span>📋 Programm</span><div class="head-actions"><button id="aeOpen" class="head-add">➕ Event</button><button id="tlClose">✕</button></div></div>
+    <div class="sheet-head"><span>📋 Schedule</span><div class="head-actions"><button id="aeOpen" class="head-add">➕ Event</button><button id="tlClose">✕</button></div></div>
     <div id="tlFilter"></div>
     <div id="tlList"></div>
   </div>
 
-  <!-- Crew-Liste -->
+  <!-- Crew list -->
   <div id="crewSheet" class="sheet hidden">
     <div class="sheet-head"><span>👥 Crew</span><button id="crClose">✕</button></div>
     <div id="crewList"></div>
   </div>
 
-  <!-- Crew-Chat + DMs -->
+  <!-- Crew chat + DMs -->
   <div id="chatSheet" class="sheet hidden">
-    <div class="sheet-head"><span id="chatTitle">💬 Crew-Chat</span><button id="chClose">✕</button></div>
+    <div class="sheet-head"><span id="chatTitle">💬 Crew Chat</span><button id="chClose">✕</button></div>
     <div id="chTabs"></div>
     <div id="chList"></div>
     <div id="chInputBar">
-      <input id="chInput" type="text" placeholder="Nachricht an die Crew…" maxlength="280" autocomplete="off" />
-      <button id="chSend">Senden</button>
+      <input id="chInput" type="text" placeholder="Message the crew…" maxlength="280" autocomplete="off" />
+      <button id="chSend" aria-label="Send"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></svg></button>
     </div>
   </div>
 
-  <!-- Event hinzufügen -->
+  <!-- Add event -->
   <div id="addEventSheet" class="sheet hidden">
-    <div class="sheet-head"><span>➕ Event hinzufügen</span><button id="aeClose">✕</button></div>
+    <div class="sheet-head"><span>➕ Add event</span><button id="aeClose">✕</button></div>
     <div id="aeForm">
-      <label>Name<input id="aeName" type="text" placeholder="z.B. Sunset Rooftop" maxlength="60" autocomplete="off" /></label>
-      <label>Adresse (in Paris)<input id="aeAddr" type="text" placeholder="z.B. 5 Rue de Rivoli" maxlength="120" autocomplete="off" /></label>
-      <label>Datum<input id="aeDate" type="date" value="2026-06-21" /></label>
+      <label>Name<input id="aeName" type="text" placeholder="e.g. Sunset Rooftop" maxlength="60" autocomplete="off" /></label>
+      <label>Address (in Paris)<input id="aeAddr" type="text" placeholder="e.g. 5 Rue de Rivoli" maxlength="120" autocomplete="off" /></label>
+      <label>Date<input id="aeDate" type="date" value="2026-06-21" /></label>
       <div class="ae-row">
-        <label>Von<input id="aeVon" type="time" value="22:00" /></label>
-        <label>Bis<input id="aeBis" type="time" value="04:00" /></label>
+        <label>From<input id="aeVon" type="time" value="22:00" /></label>
+        <label>To<input id="aeBis" type="time" value="04:00" /></label>
       </div>
       <div class="ae-divider">Act (optional)</div>
-      <label>Act-Name<input id="aeAct" type="text" placeholder="DJ / Live-Act" maxlength="40" autocomplete="off" /></label>
+      <label>Act name<input id="aeAct" type="text" placeholder="DJ / live act" maxlength="40" autocomplete="off" /></label>
       <div class="ae-row">
-        <label>Act von<input id="aeActVon" type="time" /></label>
-        <label>Act bis<input id="aeActBis" type="time" /></label>
+        <label>Act from<input id="aeActVon" type="time" /></label>
+        <label>Act to<input id="aeActBis" type="time" /></label>
       </div>
-      <button id="aeSubmit">Event speichern</button>
+      <button id="aeSubmit">Save event</button>
       <div id="aeMsg"></div>
     </div>
   </div>
 
-  <!-- Status-Picker -->
+  <!-- Status picker -->
   <div id="statusSheet" class="sheet hidden">
-    <div class="sheet-head"><span>💬 Dein Status</span><button id="stClose">✕</button></div>
+    <div class="sheet-head"><span>💬 Your status</span><button id="stClose">✕</button></div>
     <div id="stOptions"></div>
-    <div id="pushRow"><button id="pushBtn">🔔 Push-Benachrichtigungen aktivieren</button></div>
+    <div id="pushRow"><button id="pushBtn">🔔 Enable push notifications</button></div>
   </div>
 
   <div id="installOverlay" class="hidden">
     <div class="card">
       <h1>📍 FDLM Live</h1>
-      <p>Damit Benachrichtigungen funktionieren, musst du die App kurz zum Home-Bildschirm hinzufügen — danach von dort öffnen.</p>
+      <p>For notifications to work, add the app to your Home Screen — then open it from there.</p>
       <ol class="install-steps">
-        <li>Unten auf <b>Teilen</b> tippen <span class="ish">⬆️</span></li>
-        <li><b>„Zum Home-Bildschirm"</b> wählen</li>
-        <li>Diese App über das <b>neue Icon</b> öffnen</li>
+        <li>Tap <b>Share</b> at the bottom <span class="ish">⬆️</span></li>
+        <li>Choose <b>“Add to Home Screen”</b></li>
+        <li>Open this app via the <b>new icon</b></li>
       </ol>
-      <p class="install-hint">Dann Namen eingeben & „Erlauben" tippen — fertig.</p>
+      <p class="install-hint">Then enter your name & tap “Allow” — done.</p>
     </div>
   </div>
 
   <div id="nameOverlay">
     <div class="card">
-      <h1>Wer bist du?</h1>
-      <p>Name &amp; (optional) Foto werden deiner Crew auf der Karte angezeigt.</p>
-      <input id="nameInput" type="text" placeholder="z.B. Leroy" maxlength="20" autocomplete="off" />
+      <h1>Who are you?</h1>
+      <p>Your name &amp; (optional) photo are shown to your crew on the map.</p>
+      <input id="nameInput" type="text" placeholder="e.g. Leroy" maxlength="20" autocomplete="off" />
       <label id="photoPick" for="photoInput">
         <span id="photoPreview"></span>
-        <span class="photo-label">📷 Foto hinzufügen (optional)</span>
+        <span class="photo-label">📷 Add photo (optional)</span>
       </label>
       <input id="photoInput" type="file" accept="image/*" class="hidden" />
-      <button id="nameSubmit">Los geht's</button>
+      <button id="nameSubmit">Let’s go</button>
     </div>
   </div>
 
-  <script src="config.js?v=1"></script>
-  <script src="app.js?v=1"></script>
+  <script src="config.js?v=9"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>
