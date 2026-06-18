@@ -223,7 +223,8 @@ function colorForUid(uid) {
 const friendMarkers = {}, friendData = {};
 
 // ---- Map ----
-const map = L.map("map", { zoomControl: true }).setView([48.8649, 2.3550], 13);
+const map = L.map("map", { zoomControl: false }).setView([48.8649, 2.3550], 13);
+map.attributionControl.setPrefix(false); // hide the "Leaflet" + flag branding (keep data attribution)
 const baseStreets = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
   maxZoom: 20, subdomains: "abcd", detectRetina: true,
   attribution: '© OpenStreetMap © CARTO',
@@ -231,20 +232,27 @@ const baseStreets = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/v
 const baseSatellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
   maxZoom: 19, attribution: '© Esri, Maxar, Earthstar Geographics',
 });
-let layersControl = L.control.layers({ "🗺️ Map": baseStreets, "🛰️ Satellite": baseSatellite }, null, { position: "topright", collapsed: true }).addTo(map);
+let layersControl = L.control.layers({ "🗺️ Map": baseStreets, "🛰️ Satellite": baseSatellite }, null, { position: "bottomright", collapsed: true }).addTo(map);
 
 // Real Google Maps — only if an API key is set in config.js. Loads Google's
 // official JS API and renders it as a Leaflet layer (GoogleMutant), so all
 // existing markers/popups/controls keep working unchanged. No key → CARTO stays.
+// Cleaner Google base map: hide museums, monuments and churches so the party
+// pins stand out. Everything else stays default — streets, neighbourhood and
+// park names, bus stops, restaurants/shops and the river label all remain.
+const CLEAN_MAP_STYLE = [
+  { featureType: "poi.attraction",       stylers: [{ visibility: "off" }] }, // museums, monuments
+  { featureType: "poi.place_of_worship", stylers: [{ visibility: "off" }] }, // churches
+];
 if (window.__GMAPS_KEY && window.L && L.gridLayer && L.gridLayer.googleMutant) {
   window.__initGmaps = () => {
     try {
-      const gRoad = L.gridLayer.googleMutant({ type: "roadmap" });
-      const gSat = L.gridLayer.googleMutant({ type: "hybrid" });
+      const gRoad = L.gridLayer.googleMutant({ type: "roadmap", styles: CLEAN_MAP_STYLE });
+      const gSat = L.gridLayer.googleMutant({ type: "hybrid", styles: CLEAN_MAP_STYLE });
       map.removeLayer(baseStreets);
       if (layersControl) map.removeControl(layersControl);
       gRoad.addTo(map);
-      layersControl = L.control.layers({ "🗺️ Google": gRoad, "🛰️ Satellite": gSat }, null, { position: "topright", collapsed: true }).addTo(map);
+      layersControl = L.control.layers({ "🗺️ Google": gRoad, "🛰️ Satellite": gSat }, null, { position: "bottomright", collapsed: true }).addTo(map);
       // GoogleMutant manchmal grau, bis die Karte einmal neu vermessen wird
       setTimeout(() => map.invalidateSize(), 300);
     } catch (e) { console.warn("Google Maps init failed — keeping fallback map", e); }

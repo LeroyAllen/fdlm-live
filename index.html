@@ -171,6 +171,14 @@
     }
 
     /* Bottom-Bar — floating frosted pill (Apple-style) */
+    /* Layer/Satellite toggle — small, bottom-right above the safe area */
+    .leaflet-bottom.leaflet-right { margin-bottom: calc(53px + env(safe-area-inset-bottom)); margin-right: 10px; }
+    .leaflet-control-layers { border-radius: 10px !important; box-shadow: 0 2px 8px rgba(0,0,0,.25) !important; border: 0 !important; }
+    .leaflet-control-layers-toggle {
+      width: 34px !important; height: 34px !important;
+      background-size: 18px 18px !important;
+    }
+
     #bottomBar {
       position: fixed; left: 50%; transform: translateX(-50%);
       bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 1001;
@@ -535,7 +543,7 @@
     <div class="card">
       <h1>Who are you?</h1>
       <p>Your name &amp; (optional) photo are shown to your crew on the map.</p>
-      <input id="nameInput" type="text" placeholder="e.g. Leroy" maxlength="20" autocomplete="off" />
+      <input id="nameInput" type="text" placeholder="e.g. Amos" maxlength="20" autocomplete="off" />
       <label id="photoPick" for="photoInput">
         <span id="photoPreview"></span>
         <span class="photo-label">📷 Add photo (optional)</span>
@@ -545,7 +553,7 @@
     </div>
   </div>
 
-  <script src="config.js?v=9"></script>
-  <script src="app.js?v=9"></script>
+  <script src="config.js?v=13"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>
