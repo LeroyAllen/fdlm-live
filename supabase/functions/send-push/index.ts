@@ -44,7 +44,7 @@ Deno.serve(async (req: Request) => {
   try {
     if (!(await ensureVapid())) return json({ error: "vapid-missing" });
     const { kind, senderUid, recipientUid, name, text } = await req.json();
-    if (!kind || !text) return json({ error: "missing fields" }, 400);
+    if (!kind || (kind !== "ping" && !text)) return json({ error: "missing fields" }, 400);
 
     const { data: subs, error } = await supabase
       .from("push_subscriptions").select("uid, subscription");
@@ -52,11 +52,15 @@ Deno.serve(async (req: Request) => {
 
     let targets = subs ?? [];
     if (kind === "crew") targets = targets.filter((s) => s.uid !== senderUid);
-    else if (kind === "dm") targets = targets.filter((s) => s.uid === recipientUid);
+    else if (kind === "dm" || kind === "ping") targets = targets.filter((s) => s.uid === recipientUid);
     else targets = [];
 
-    const title = kind === "crew" ? "💬 Crew Chat" : `💬 ${name || "Friend"} (private)`;
-    const body = kind === "crew" ? `${name || "Friend"}: ${text}` : text;
+    const title = kind === "crew" ? "💬 Crew Chat"
+      : kind === "ping" ? `👋 ${name || "Someone"} is looking for you`
+      : `💬 ${name || "Friend"} (private)`;
+    const body = kind === "crew" ? `${name || "Friend"}: ${text}`
+      : kind === "ping" ? (text || "Tap to open the map and meet up")
+      : text;
     const payload = JSON.stringify({ title, body, url: "./" });
 
     let sent = 0;
