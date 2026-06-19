@@ -409,6 +409,11 @@ let sb = null;
 // Realtime channel handles — kept so we can tear them down and re-subscribe on reconnect (A1).
 let chMembers = null, chEvents = null, chMessages = null;
 let lastResync = 0, lastBeat = 0;
+// Connection-honesty (1.2): when realtime last delivered + whether our own writes land.
+let lastRealtimeOk = Date.now();
+let statusStale = false;
+let upsertOk = true;
+const REALTIME_STALE_MS = 5 * 60 * 1000; // no live update for 5 min → honest "offline" hint
 
 function rowToMember(r) {
   return { id: r.id, name: r.name, photo: r.photo || null, lat: r.lat, lng: r.lng,
@@ -429,7 +434,14 @@ async function upsertMe() {
   if (!sb || !userName) return;
   const row = { id: USER_ID, name: userName, hidden: !visible, status: myStatus, photo: myPhoto, updated_at: new Date().toISOString() };
   if (lastPos) { row.lat = lastPos.lat; row.lng = lastPos.lng; }
-  try { await sb.from("members").upsert(row); } catch (e) { console.warn(e); }
+  try {
+    const { error } = await sb.from("members").upsert(row);
+    if (error) throw error;
+    upsertOk = true; // recovered — silently clear the failure state
+  } catch (e) {
+    console.warn(e);
+    if (upsertOk) { upsertOk = false; toast("⚠️ Sync paused — check your connection"); } // toast once on ok→fail
+  }
 }
 
 function initSupabase() {
@@ -447,7 +459,8 @@ function initSupabase() {
 async function reloadMembers() {
   if (!sb) return;
   // initial + on reconnect — no auto-remove, last location stays as an offline pin
-  const { data } = await sb.from("members").select("*");
+  const { data, error } = await sb.from("members").select("*");
+  if (!error) lastRealtimeOk = Date.now(); // fresh authoritative data → connection is alive
   renderFriends(membersById(data));
 }
 async function reloadEvents() {
@@ -463,15 +476,16 @@ function subscribeRealtime() {
   if (!sb) return;
   chMembers = sb.channel("members-rt")
     .on("postgres_changes", { event: "*", schema: "public", table: "members" }, payload => {
+      lastRealtimeOk = Date.now(); // live update arrived → connection is alive
       if (payload.eventType === "DELETE") { if (payload.old && payload.old.id) delete friendData[payload.old.id]; }
       else if (payload.new) { friendData[payload.new.id] = rowToMember(payload.new); }
       renderFriends(friendData);
     }).subscribe();
   chEvents = sb.channel("events-rt")
-    .on("postgres_changes", { event: "*", schema: "public", table: "events" }, reloadEvents)
+    .on("postgres_changes", { event: "*", schema: "public", table: "events" }, () => { lastRealtimeOk = Date.now(); reloadEvents(); })
     .subscribe();
   chMessages = sb.channel("messages-rt")
-    .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, onMessageInsert)
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (p) => { lastRealtimeOk = Date.now(); onMessageInsert(p); })
     .subscribe();
 }
 function recreateRealtime() {
@@ -587,10 +601,20 @@ function renderFriends(data) {
   Object.keys(friendMarkers).forEach(uid => {
     if (!seen.has(uid)) { map.removeLayer(friendMarkers[uid]); delete friendMarkers[uid]; }
   });
-  if (onlineCount === 0 && offlineCount === 0) setStatus("You’re online — no friends yet");
-  else if (offlineCount === 0) setStatus(`${DOT_ON}${onlineCount} online`);
-  else if (onlineCount === 0) setStatus(`${DOT_OFF}${offlineCount} last seen`);
-  else setStatus(`${DOT_ON}${onlineCount} online · ${DOT_OFF}${offlineCount} offline`);
+  let normal;
+  if (onlineCount === 0 && offlineCount === 0) normal = "You’re online — no friends yet";
+  else if (offlineCount === 0) normal = `${DOT_ON}${onlineCount} online`;
+  else if (onlineCount === 0) normal = `${DOT_OFF}${offlineCount} last seen`;
+  else normal = `${DOT_ON}${onlineCount} online · ${DOT_OFF}${offlineCount} offline`;
+  // 1.2 — be honest when the realtime socket is frozen: the counts above are stale.
+  if (lastRealtimeOk && Date.now() - lastRealtimeOk > REALTIME_STALE_MS && Date.now() - lastResync > 10000) {
+    statusStale = true;
+    const staleMin = Math.max(1, Math.round((Date.now() - lastRealtimeOk) / 60000));
+    setStatus(`${DOT_OFF}⚠️ Offline · last update ${staleMin}m — tap to reconnect`);
+  } else {
+    statusStale = false;
+    setStatus(normal);
+  }
   renderVenueMarkers(); // B — refresh venue crew-count badges from the latest positions
   renderCrewList();
 }
@@ -1109,6 +1133,7 @@ function begin() {
   // A1 — recover the live socket when the app returns to the foreground / regains network.
   document.addEventListener("visibilitychange", () => { if (!document.hidden) resync("visible"); });
   window.addEventListener("online", () => resync("online"));
+  statusEl.addEventListener("click", () => { if (statusStale) resync("manual"); }); // 1.2 — tap offline hint to reconnect
 }
 
 // ---- Foto/Avatar beim Namen-Setup ----
@@ -1186,7 +1211,7 @@ document.addEventListener("click", e => {
   if (del) {
     const id = del.dataset.vid;
     if (confirm("Delete this event for everyone?") && sb) {
-      sb.from("events").delete().eq("id", id);
+      sb.from("events").delete().eq("id", id).then(({ error }) => { if (error) toast("⚠️ Delete failed — try again"); });
       map.closePopup();
     }
   }
