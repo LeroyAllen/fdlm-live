@@ -933,6 +933,21 @@ async function enablePush(mode) {
   }
 }
 
+// Soft push opt-in (3.2): ask gently in-app before hitting the iOS system prompt.
+function maybePushPrompt() {
+  if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) return; // no push support → skip
+  if (Notification.permission === "granted") { enablePush("auto").catch(() => {}); return; } // already on → refresh sub, no prompt
+  if (Notification.permission !== "default") return;                 // denied → can't ask in-app
+  if (sessionStorage.getItem("plm_push_dismissed") === "1") return;  // dismissed this session
+  document.getElementById("pushPrompt")?.classList.add("show");
+}
+function hidePushPrompt(dismiss) {
+  document.getElementById("pushPrompt")?.classList.remove("show");
+  if (dismiss) sessionStorage.setItem("plm_push_dismissed", "1");
+}
+document.getElementById("ppYes")?.addEventListener("click", () => { hidePushPrompt(false); enablePush("manual").catch(() => {}); });
+document.getElementById("ppNo")?.addEventListener("click", () => hidePushPrompt(true));
+
 // ---- Erinnerungen ----
 const notified = new Set();
 function maybeAskNotify() {
@@ -1117,9 +1132,9 @@ function begin() {
   if (initSupabase()) startTracking();
   updateNextSet();
   renderStatusOptions();
-  // Push-Frage kommt direkt beim Start (nach Namen-Setup bzw. beim Öffnen über das
-  // Home-Screen-Icon): registriert SW, fragt Erlaubnis, speichert Abo.
-  enablePush("auto").catch(() => {});
+  // Soft push opt-in (3.2): if already granted, refresh the subscription silently;
+  // otherwise show a gentle in-app banner before the iOS system prompt.
+  maybePushPrompt();
   checkReminders();
   lastBeat = Date.now();
   setInterval(() => {
