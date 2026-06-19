@@ -165,7 +165,9 @@ const VENUES = [
 ];
 
 const statusEl = document.getElementById("status");
-function setStatus(msg) { statusEl.textContent = msg; }
+function setStatus(msg) { statusEl.innerHTML = msg; }
+const DOT_ON = '<span class="st-dot on"></span>';
+const DOT_OFF = '<span class="st-dot off"></span>';
 
 // ---- Helfer ----
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
@@ -586,9 +588,9 @@ function renderFriends(data) {
     if (!seen.has(uid)) { map.removeLayer(friendMarkers[uid]); delete friendMarkers[uid]; }
   });
   if (onlineCount === 0 && offlineCount === 0) setStatus("You’re online — no friends yet");
-  else if (offlineCount === 0) setStatus(`🟢 ${onlineCount} online`);
-  else if (onlineCount === 0) setStatus(`🔴 ${offlineCount} last seen`);
-  else setStatus(`🟢 ${onlineCount} online · 🔴 ${offlineCount} offline`);
+  else if (offlineCount === 0) setStatus(`${DOT_ON}${onlineCount} online`);
+  else if (onlineCount === 0) setStatus(`${DOT_OFF}${offlineCount} last seen`);
+  else setStatus(`${DOT_ON}${onlineCount} online · ${DOT_OFF}${offlineCount} offline`);
   renderVenueMarkers(); // B — refresh venue crew-count badges from the latest positions
   renderCrewList();
 }

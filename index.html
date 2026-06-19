@@ -178,9 +178,15 @@
     #status {
       position: fixed; bottom: calc(80px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
       z-index: 1000; background: rgba(255,255,255,.92); color: #190c0d;
-      padding: 5px 11px; border-radius: 999px; font-size: 8.5px; font-weight: 700;
+      padding: 6px 13px; border-radius: 999px; font-size: 13px; font-weight: 700;
       max-width: 90%; text-align: center; box-shadow: 0 1px 6px rgba(0,0,0,.15);
     }
+    #status .st-dot {
+      display: inline-block; width: 8.4px; height: 8.4px; border-radius: 50%;
+      vertical-align: middle; margin-right: 5px; position: relative; top: -1px;
+    }
+    #status .st-dot.on  { background: #2cb846; }
+    #status .st-dot.off { background: #e03131; }
 
     /* Initials fallback inside dots (map pin + crew list) */
     .dot-initials { display: flex; align-items: center; justify-content: center; }
@@ -224,8 +230,8 @@
     #bottomBar {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 3000;
       display: flex; align-items: center; justify-content: space-around;
-      gap: 4px; padding: 10px 8px;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      gap: 4px; padding: 6px 8px;
+      padding-bottom: calc(2px + env(safe-area-inset-bottom));
       background: #fff; border-top: 1px solid rgba(0, 0, 0, .1);
     }
     #bottomBar .tab {
@@ -630,7 +636,7 @@
     </div>
   </div>
 
-  <script src="config.js?v=24"></script>
-  <script src="app.js?v=24"></script>
+  <script src="config.js?v=26"></script>
+  <script src="app.js?v=26"></script>
 </body>
 </html>
