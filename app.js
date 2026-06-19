@@ -672,8 +672,10 @@ function renderTimeline() {
   let items = allVenues().map(v => ({ v, w: venueWindow(v) })).filter(x => x.w).sort((a, b) => a.w.s - b.w.s);
   if (tlFavOnly) items = items.filter(x => isFav(x.v.id));
   document.getElementById("tlFilter").innerHTML =
-    `<button id="tlFavToggle" class="tl-filter ${tlFavOnly ? "active" : ""}">${tlFavOnly ? "⭐ Favorites only" : "All events"}</button>`;
-  document.getElementById("tlFavToggle").addEventListener("click", () => { tlFavOnly = !tlFavOnly; renderTimeline(); });
+    `<button id="tlFavOff" class="tl-filter ${!tlFavOnly ? "active" : ""}">All events</button>` +
+    `<button id="tlFavOn" class="tl-filter ${tlFavOnly ? "active" : ""}">⭐ Favorites only</button>`;
+  document.getElementById("tlFavOff").addEventListener("click", () => { tlFavOnly = false; renderTimeline(); });
+  document.getElementById("tlFavOn").addEventListener("click", () => { tlFavOnly = true; renderTimeline(); });
   if (items.length === 0) { document.getElementById("tlList").innerHTML = '<div class="chat-empty">No favorites yet — tap ☆ Favorite on an event.</div>'; return; }
 
   // "Jetzt live"-Streifen
@@ -871,21 +873,6 @@ function renderStatusOptions() {
 }
 
 // ---- Push (Web-Push via VAPID) ----
-async function updatePushBtn() {
-  const b = document.getElementById("pushBtn");
-  if (!b) return;
-  // A4 — reconcile the stored flag against the REAL subscription so we never show
-  // "Push on" when iOS/the browser has silently dropped the subscription.
-  if (localStorage.getItem("plm_push") && "serviceWorker" in navigator) {
-    try {
-      const reg = await navigator.serviceWorker.getRegistration();
-      const sub = reg && await reg.pushManager.getSubscription();
-      if (!sub) localStorage.removeItem("plm_push");
-    } catch (e) { /* keep last-known state */ }
-  }
-  if (localStorage.getItem("plm_push")) { b.textContent = "🔔 Push on ✓"; b.classList.add("active"); }
-  else { b.textContent = "🔔 Enable push notifications"; b.classList.remove("active"); }
-}
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -914,7 +901,6 @@ async function enablePush(mode) {
     const { error } = await sb.from("push_subscriptions").upsert({ uid: USER_ID, subscription: sub.toJSON() });
     if (error) { fail("Couldn’t save push."); return; }
     localStorage.setItem("plm_push", "1");
-    updatePushBtn();
     if (loud) alert("🔔 Push enabled! ✓");
   } catch (e) {
     if (loud) alert("🔔 Push error: " + (e && e.message ? e.message : e));
@@ -1105,9 +1091,8 @@ function begin() {
   if (initSupabase()) startTracking();
   updateNextSet();
   renderStatusOptions();
-  updatePushBtn();
-  // Push automatisch einrichten (registriert SW, fragt Erlaubnis, speichert Abo).
-  // Beim ersten Mal nicht-silent (zeigt Prompt + Erfolg/Fehler), danach still erneuern.
+  // Push-Frage kommt direkt beim Start (nach Namen-Setup bzw. beim Öffnen über das
+  // Home-Screen-Icon): registriert SW, fragt Erlaubnis, speichert Abo.
   enablePush("auto").catch(() => {});
   checkReminders();
   lastBeat = Date.now();
@@ -1174,8 +1159,7 @@ document.getElementById("aeClose").addEventListener("click", closeSheets);
 document.getElementById("aeSubmit").addEventListener("click", submitNewEvent);
 document.getElementById("crewBtn").addEventListener("click", () => { renderCrewList(); openSheet("crewSheet"); });
 document.getElementById("crClose").addEventListener("click", closeSheets);
-document.getElementById("statusBtn").addEventListener("click", () => { renderStatusOptions(); updatePushBtn(); openSheet("statusSheet"); });
-document.getElementById("pushBtn").addEventListener("click", () => enablePush("manual"));
+document.getElementById("statusBtn").addEventListener("click", () => { renderStatusOptions(); openSheet("statusSheet"); });
 document.getElementById("tlClose").addEventListener("click", closeSheets);
 document.getElementById("stClose").addEventListener("click", closeSheets);
 document.getElementById("chatBtn").addEventListener("click", () => {
@@ -1209,11 +1193,14 @@ document.getElementById("chClose").addEventListener("click", closeSheets);
 document.getElementById("chSend").addEventListener("click", sendChat);
 document.getElementById("chInput").addEventListener("keydown", e => { if (e.key === "Enter") sendChat(); });
 
+const EYE_OPEN = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const EYE_SLASH = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+
 const hideBtn = document.getElementById("hideBtn");
 hideBtn.addEventListener("click", () => {
   visible = !visible;
-  hideBtn.textContent = visible ? "Visible" : "Hidden";
-  hideBtn.classList.toggle("ghost", !visible);
+  hideBtn.innerHTML = (visible ? EYE_OPEN : EYE_SLASH) + `<span id="hideLabel">${visible ? "Visible" : "Hidden"}</span>`;
+  hideBtn.classList.toggle("active", visible);
   upsertMe();
 });
 
