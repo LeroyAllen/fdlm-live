@@ -271,6 +271,9 @@ function allVenues() { return VENUES.concat(dbEvents); }
 function venueById(id) { return allVenues().find(v => v.id === id); }
 function isDbEvent(id) { return dbEvents.some(e => e.id === id); }
 const venueMarkerById = {};
+// ---- Treffpunkt-Pins (meet_pins) ----
+const meetPinMarkers = {}; // id -> L.marker
+let meetPins = [];         // [{id,lat,lng,label,by,byName,expires}]
 // ---- Crew at a venue (B) — client-side proximity over the live friendData ----
 const CREW_VENUE_RADIUS_M = 110; // ~1 block tolerance for GPS jitter in dense Paris
 function crewAtVenue(v) {
@@ -372,6 +375,51 @@ function venuePopupHtml(v) {
          `<a class="route-btn" href="${dir}" target="_blank" rel="noopener">${DIR_ICON}<span>Directions</span></a>${delBtn}</div>`;
 }
 
+// ---- Treffpunkt-Pins: Icon / Popup / Render ----
+function meetPinIcon() {
+  return L.divIcon({
+    className: "",
+    html: `<div class="meet-pin"><span>🚩</span></div>`,
+    iconSize: [34, 34], iconAnchor: [17, 33], popupAnchor: [0, -30],
+  });
+}
+function meetPinPopupHtml(p) {
+  const dir = `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+  const minsLeft = Math.max(0, Math.round((p.expires - Date.now()) / 60000));
+  const left = minsLeft >= 60 ? `${Math.round(minsLeft / 60)} h` : `${minsLeft} min`;
+  const canDel = p.by === USER_ID || isAdmin();
+  const del = canDel ? `<button class="meet-del-btn" data-id="${p.id}">🗑 Remove meeting point</button>` : "";
+  return `<div class="friend-popup"><b>🚩 ${escapeHtml(p.label)}</b>` +
+         `<div class="sub">set by ${escapeHtml(p.byName)} · expires in ${left}</div>` +
+         `<a class="route-btn" href="${dir}" target="_blank" rel="noopener">${DIR_ICON}<span>Directions</span></a>${del}</div>`;
+}
+function renderMeetPins() {
+  const seen = new Set(), now = Date.now();
+  meetPins.forEach(p => {
+    if (typeof p.lat !== "number" || typeof p.lng !== "number") return;
+    if (p.expires && p.expires <= now) return; // abgelaufen → nicht zeigen
+    seen.add(p.id);
+    if (meetPinMarkers[p.id]) {
+      meetPinMarkers[p.id].setLatLng([p.lat, p.lng]);
+    } else {
+      const m = L.marker([p.lat, p.lng], { icon: meetPinIcon(), zIndexOffset: 400 }).addTo(map);
+      m.bindPopup("", { closeButton: true });
+      m.on("popupopen", () => m.setPopupContent(meetPinPopupHtml(meetPins.find(x => x.id === p.id) || p)));
+      meetPinMarkers[p.id] = m;
+    }
+  });
+  Object.keys(meetPinMarkers).forEach(id => {
+    if (!seen.has(id)) { map.removeLayer(meetPinMarkers[id]); delete meetPinMarkers[id]; }
+  });
+}
+async function reloadPins() {
+  if (!sb) return;
+  const nowIso = new Date().toISOString();
+  const { data } = await sb.from("meet_pins").select("*").gt("expires_at", nowIso);
+  meetPins = (data || []).map(rowToMeetPin);
+  renderMeetPins();
+}
+
 // ---- "Dein nächster Stop"-Banner (nächster favorisierter Event) ----
 function favStops() {
   const arr = [];
@@ -407,7 +455,7 @@ document.getElementById("nextSet").addEventListener("click", e => {
 // ---- Supabase ----
 let sb = null;
 // Realtime channel handles — kept so we can tear them down and re-subscribe on reconnect (A1).
-let chMembers = null, chEvents = null, chMessages = null;
+let chMembers = null, chEvents = null, chMessages = null, chPins = null;
 let lastResync = 0, lastBeat = 0;
 // Connection-honesty (1.2): when realtime last delivered + whether our own writes land.
 let lastRealtimeOk = Date.now();
@@ -423,6 +471,11 @@ function rowToEvent(r) {
   return { id: r.id, name: r.name, address: r.address, lat: r.lat, lng: r.lng,
            dateLabel: r.date_label, start: r.start_ts, end: r.end_ts,
            lineup: Array.isArray(r.lineup) ? r.lineup : [], color: r.color, emoji: r.emoji || "🎉", addedBy: r.added_by };
+}
+function rowToMeetPin(r) {
+  return { id: r.id, lat: r.lat, lng: r.lng, label: r.label || "Meet here",
+           by: r.created_by, byName: r.created_by_name || "Someone",
+           expires: r.expires_at ? Date.parse(r.expires_at) : 0 };
 }
 function membersById(rows) {
   const m = {}; (rows || []).forEach(r => { m[r.id] = rowToMember(r); }); return m;
@@ -450,6 +503,7 @@ function initSupabase() {
   sb = window.supabase.createClient(url, key, { realtime: { params: { eventsPerSecond: 5 } } });
   reloadMembers();
   reloadEvents();
+  reloadPins();
   setupChat();          // ensures the "crew" channel state exists
   subscribeRealtime();
   return true;
@@ -484,14 +538,17 @@ function subscribeRealtime() {
   chEvents = sb.channel("events-rt")
     .on("postgres_changes", { event: "*", schema: "public", table: "events" }, () => { lastRealtimeOk = Date.now(); reloadEvents(); })
     .subscribe();
+  chPins = sb.channel("pins-rt")
+    .on("postgres_changes", { event: "*", schema: "public", table: "meet_pins" }, () => { lastRealtimeOk = Date.now(); reloadPins(); })
+    .subscribe();
   chMessages = sb.channel("messages-rt")
     .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (p) => { lastRealtimeOk = Date.now(); onMessageInsert(p); })
     .subscribe();
 }
 function recreateRealtime() {
   if (!sb) return;
-  [chMembers, chEvents, chMessages].forEach(ch => { if (ch) { try { sb.removeChannel(ch); } catch (e) {} } });
-  chMembers = chEvents = chMessages = null;
+  [chMembers, chEvents, chMessages, chPins].forEach(ch => { if (ch) { try { sb.removeChannel(ch); } catch (e) {} } });
+  chMembers = chEvents = chMessages = chPins = null;
   subscribeRealtime();
 }
 
@@ -505,7 +562,7 @@ async function resync(reason) {
   lastResync = now;
   setStatus("Reconnecting…");
   try {
-    await Promise.all([reloadMembers(), reloadEvents()]);
+    await Promise.all([reloadMembers(), reloadEvents(), reloadPins()]);
     await loadActiveChannelFresh();
     await upsertMe();
     recreateRealtime();
@@ -570,8 +627,15 @@ function friendPopupHtml(uid, u) {
   const seen = mins <= 0 ? "just now" : (mins === 1 ? "1 min ago" : `${mins} min ago`);
   const offlineLine = online ? "" : `<div class="sub offline-line">🔴 Offline · last location</div>`;
   const dir = `https://www.google.com/maps/search/?api=1&query=${u.lat},${u.lng}`;
-  return `<div class="friend-popup"><b>${escapeHtml(u.name || "?")}</b>${offlineLine}${stLine}<div class="sub">📡 Location ${seen}</div>` +
+  let distLine = "";
+  if (lastPos && typeof u.lat === "number" && typeof u.lng === "number") {
+    const m = haversineKm(lastPos, u) * 1000;
+    const txt = m < 1000 ? `${Math.round(m)} m away` : `${(m / 1000).toFixed(1)} km away`;
+    distLine = `<div class="dist">📍 ${txt}</div>`;
+  }
+  return `<div class="friend-popup"><b>${escapeHtml(u.name || "?")}</b>${offlineLine}${stLine}<div class="sub">📡 Location ${seen}</div>${distLine}` +
          `<a class="route-btn" href="${dir}" target="_blank" rel="noopener">${DIR_ICON}<span>Route to ${escapeHtml(u.name || "Friend")}</span></a>` +
+         `<button class="ping-btn" data-uid="${uid}" data-name="${escapeHtml(u.name || "Friend")}">👋 Ping ${escapeHtml(u.name || "Friend")}</button>` +
          `<button class="dm-btn" data-uid="${uid}" data-name="${escapeHtml(u.name || "Friend")}">💬 Private chat with ${escapeHtml(u.name || "Friend")}</button></div>`;
 }
 
@@ -1123,6 +1187,22 @@ function startDmWith(uid, name) {
   openSheet("chatSheet"); chatOpen = true;
   openChannel(ch, name);
 }
+function pingFriend(uid, name) {
+  if (!sb) return;
+  triggerPush("ping", uid, "");
+  toast("👋 Pinged " + (name || "friend"));
+}
+async function createMeetPin(lat, lng) {
+  if (!sb || !userName) { toast("Set your name first"); return; }
+  const label = (prompt("Name this meeting point", "Meet here") || "").trim() || "Meet here";
+  const expires = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(); // 2 Std.
+  const { error } = await sb.from("meet_pins").insert({
+    lat, lng, label, created_by: USER_ID, created_by_name: userName, expires_at: expires,
+  });
+  if (error) { toast("Couldn't set meeting point"); return; }
+  triggerPush("crew", null, `📍 Meeting point: ${label}`);
+  toast("📍 Meeting point set — crew notified");
+}
 
 // ---- UI ----
 const nameOverlay = document.getElementById("nameOverlay");
@@ -1211,6 +1291,8 @@ document.getElementById("chatBtn").addEventListener("click", () => {
 document.addEventListener("click", e => {
   const btn = e.target.closest(".dm-btn");
   if (btn) startDmWith(btn.dataset.uid, btn.dataset.name);
+  const ping = e.target.closest(".ping-btn");
+  if (ping) pingFriend(ping.dataset.uid, ping.dataset.name);
   const fb = e.target.closest(".fav-btn");
   if (fb) {
     const id = fb.dataset.vid;
@@ -1230,6 +1312,8 @@ document.addEventListener("click", e => {
       map.closePopup();
     }
   }
+  const md = e.target.closest(".meet-del-btn");
+  if (md && sb) { sb.from("meet_pins").delete().eq("id", md.dataset.id).then(({ error }) => { if (error) toast("⚠️ Delete failed — try again"); }); map.closePopup(); toast("📍 Meeting point removed"); }
 });
 document.getElementById("chClose").addEventListener("click", closeSheets);
 document.getElementById("chSend").addEventListener("click", sendChat);
@@ -1265,6 +1349,8 @@ function locateMe() {
 }
 document.getElementById("locateBtn").addEventListener("click", locateMe);
 document.getElementById("satBtn").addEventListener("click", toggleSatellite);
+document.getElementById("meetBtn").addEventListener("click", () => createMeetPin(map.getCenter().lat, map.getCenter().lng));
+map.on("contextmenu", e => createMeetPin(e.latlng.lat, e.latlng.lng)); // Long-Press (Touch) / Rechtsklick
 
 // Auf dem Handy nur in der installierten Home-App registrieren (sonst Doppel-Accounts:
 // Safari-Tab und Home-App haben getrennte Speicher). Im Safari-Tab → Installations-Anleitung.

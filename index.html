@@ -144,6 +144,20 @@
     }
     .venue-pin span { transform: rotate(45deg); font-size: 15px; }
 
+    /* Treffpunkt-Pin auf der Karte (blau, hebt sich von Venue-/Friend-Pins ab) */
+    .meet-pin {
+      width: 34px; height: 34px; border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg); background: #1a73e8;
+      border: 2.5px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.45);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .meet-pin span { transform: rotate(45deg); font-size: 17px; line-height: 1; }
+    .friend-popup .meet-del-btn {
+      display: block; width: 100%; margin-top: 8px; padding: 8px;
+      background: #fff0f0; color: #c92a2a; border: 1px solid #ffc9c9;
+      border-radius: 999px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+    }
+
     .leaflet-popup-content { margin: 12px 14px; font-size: 14px; }
     .leaflet-popup-content b { font-size: 15px; }
     .leaflet-popup-content .route-btn {
@@ -232,7 +246,7 @@
       bottom: calc(86px + env(safe-area-inset-bottom)); z-index: 1001;
       display: flex; flex-direction: column; gap: 8px;
     }
-    #locateBtn, #satBtn {
+    #locateBtn, #satBtn, #meetBtn {
       width: 44px; height: 44px; border: 0; border-radius: 12px;
       background: #fff; color: #190c0d;
       box-shadow: 0 2px 8px rgba(0,0,0,.22), 0 0 0 0.5px rgba(0,0,0,.06);
@@ -240,7 +254,7 @@
       cursor: pointer; -webkit-tap-highlight-color: transparent;
       transition: transform .08s;
     }
-    #locateBtn:active, #satBtn:active { transform: scale(.9); }
+    #locateBtn:active, #satBtn:active, #meetBtn:active { transform: scale(.9); }
     #satBtn.active { background: #190c0d; color: #fff; }
 
     #bottomBar {
@@ -500,6 +514,12 @@
       background: var(--bg); color: #fff; border: 0; border-radius: 999px;
       font-weight: 600; font-size: 13px; cursor: pointer;
     }
+    /* Ping-Button im Friend-Popup (Akzentfarbe, hebt sich vom DM-Button ab) */
+    .ping-btn {
+      display: block; width: 100%; margin-top: 6px; padding: 8px 14px;
+      background: var(--accent); color: #fff; border: 0; border-radius: 999px;
+      font-weight: 600; font-size: 13px; cursor: pointer;
+    }
 
     /* Sheet-header icons (same mask technique as bottom bar) */
     .sh-icon {
@@ -561,6 +581,11 @@
   </div>
 
   <div id="mapControls">
+    <button id="meetBtn" aria-label="Set meeting point">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>
+      </svg>
+    </button>
     <button id="locateBtn" aria-label="My location">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="7"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/>
@@ -658,7 +683,7 @@
     </div>
   </div>
 
-  <script src="config.js?v=28"></script>
-  <script src="app.js?v=28"></script>
+  <script src="config.js?v=29"></script>
+  <script src="app.js?v=29"></script>
 </body>
 </html>
