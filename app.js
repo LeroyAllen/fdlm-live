@@ -232,7 +232,8 @@ const baseStreets = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/v
 const baseSatellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
   maxZoom: 19, attribution: '© Esri, Maxar, Earthstar Geographics',
 });
-let layersControl = L.control.layers({ "🗺️ Map": baseStreets, "🛰️ Satellite": baseSatellite }, null, { position: "bottomright", collapsed: true }).addTo(map);
+let isSatellite = false;
+let curBase = baseStreets, curSat = baseSatellite;
 
 // Real Google Maps — only if an API key is set in config.js. Loads Google's
 // official JS API and renders it as a Leaflet layer (GoogleMutant), so all
@@ -249,10 +250,9 @@ if (window.__GMAPS_KEY && window.L && L.gridLayer && L.gridLayer.googleMutant) {
     try {
       const gRoad = L.gridLayer.googleMutant({ type: "roadmap", styles: CLEAN_MAP_STYLE });
       const gSat = L.gridLayer.googleMutant({ type: "hybrid", styles: CLEAN_MAP_STYLE });
-      map.removeLayer(baseStreets);
-      if (layersControl) map.removeControl(layersControl);
-      gRoad.addTo(map);
-      layersControl = L.control.layers({ "🗺️ Google": gRoad, "🛰️ Satellite": gSat }, null, { position: "bottomright", collapsed: true }).addTo(map);
+      map.removeLayer(isSatellite ? curSat : curBase);
+      curBase = gRoad; curSat = gSat;
+      (isSatellite ? gSat : gRoad).addTo(map);
       // GoogleMutant manchmal grau, bis die Karte einmal neu vermessen wird
       setTimeout(() => map.invalidateSize(), 300);
     } catch (e) { console.warn("Google Maps init failed — keeping fallback map", e); }
@@ -524,6 +524,13 @@ function statusOf(key) { return STATUSES.find(s => s.key === key); }
 const ONLINE_WINDOW_MS = 45 * 60 * 1000; // 45 Min ohne Update → offline (ehrlicher fürs nächtliche Tempo)
 function isOnline(u) { return !!u && !u.hidden && u.ts && (Date.now() - u.ts < ONLINE_WINDOW_MS); }
 
+function getInitials(name) {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 function friendIcon(isMe, name, color, statusKey, online, photo) {
   const dotColor = !online ? "#e03131" : (isMe ? "#2b7fff" : color);
   const st = statusOf(statusKey);
@@ -531,7 +538,7 @@ function friendIcon(isMe, name, color, statusKey, online, photo) {
   const offlineCls = online ? "" : " offline";
   const dot = photo
     ? `<div class="dot photo" style="background-image:url('${photo}');border-color:${!online ? "#e03131" : (isMe ? "#2b7fff" : "#fff")}">${badge}</div>`
-    : `<div class="dot" style="background:${dotColor}">${badge}</div>`;
+    : `<div class="dot dot-initials" style="background:${dotColor}"><span class="dot-txt">${getInitials(name)}</span>${badge}</div>`;
   return L.divIcon({
     className: "",
     html: `<div class="friend-pin ${isMe ? "me" : ""}${offlineCls}">${dot}<div class="label">${escapeHtml(name)}</div></div>`,
@@ -597,18 +604,16 @@ function startTracking() {
     lastPos = { lat: latitude, lng: longitude };
     const now = Date.now();
     const movedM = lastUpPos ? haversineKm(lastUpPos, lastPos) * 1000 : Infinity;
-    // Battery: only write to the DB every 5 min OR after >75 m of movement.
-    if (firstFix || now - lastUpload > 5 * 60 * 1000 || movedM > 75) {
+    // Upload every 30 s OR after >30 m of movement.
+    if (firstFix || now - lastUpload > 30 * 1000 || movedM > 30) {
       lastUpload = now; lastUpPos = lastPos;
       upsertMe();
     }
     if (firstFix) {
       map.setView([latitude, longitude], 15);
       firstFix = false;
-      // A3 — after the first precise fix, downgrade to low-power tracking to save
-      // battery over a long night. The 5-min/75-m write throttle above is unchanged.
       if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-      watchId = navigator.geolocation.watchPosition(onPos, onErr, { enableHighAccuracy: false, maximumAge: 60000, timeout: 30000 });
+      watchId = navigator.geolocation.watchPosition(onPos, onErr, { enableHighAccuracy: false, maximumAge: 15000, timeout: 20000 });
     }
   };
   watchId = navigator.geolocation.watchPosition(onPos, onErr, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
@@ -715,7 +720,7 @@ function renderTimeline() {
           <span class="tl-dot" style="background:${v.color}">${v.emoji}</span>
           <span class="tl-mid"><span class="tl-name">${escapeHtml(v.name)}${favIcon}</span>
           <span class="tl-time">${fmtWeekday(w.s)} ${fmtTime(new Date(w.s).toISOString())}–${fmtTime(new Date(w.e).toISOString())}</span></span>
-          ${badge}<span class="tl-chev">▾</span>
+          ${badge}<svg class="tl-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#c0b3b0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="tl-detail"><div class="tl-detail-inner">
           ${loc}
@@ -732,8 +737,10 @@ function renderTimeline() {
   document.querySelectorAll("#tlList .tl-head").forEach(head => head.addEventListener("click", () => {
     const id = head.dataset.toggle;
     const row = head.parentElement;
-    if (tlOpen.has(id)) { tlOpen.delete(id); row.classList.remove("open"); }
-    else { tlOpen.add(id); row.classList.add("open"); }
+    const isOpen = tlOpen.has(id);
+    document.querySelectorAll("#tlList .tl-row.open").forEach(r => r.classList.remove("open"));
+    tlOpen.clear();
+    if (!isOpen) { tlOpen.add(id); row.classList.add("open"); }
   }));
 
   // "Auf der Karte zeigen" + Live-Karten → zum Pin springen
@@ -813,7 +820,7 @@ function renderCrewList() {
       : (isMe ? "You" : (online ? (st ? `${st.emoji} ${st.label}` : `📡 ${seen}`) : `🔴 last seen ${seen}`));
     const dot = (u.photo
       ? `<span class="crew-dot photo" style="background-image:url('${u.photo}')"></span>`
-      : `<span class="crew-dot" style="background:${color}"></span>`) + `<span class="crew-online ${online ? 'on' : 'off'}"></span>`;
+      : `<span class="crew-dot crew-dot-initials" style="background:${color}">${getInitials(u.name || "?")}</span>`) + `<span class="crew-online ${online ? 'on' : 'off'}"></span>`;
     const adminDel = (admin && !isMe) ? `<button class="crew-del" data-uid="${uid}" data-name="${escapeHtml(u.name || "?")}">🗑</button>` : "";
     return `<div class="crew-row" data-uid="${uid}"><div class="crew-avatar">${dot}</div>` +
            `<div class="crew-mid"><div class="crew-name">${escapeHtml(u.name || "?")}${isMe ? ' <span class="crew-me">(you)</span>' : ''}</div><div class="crew-sub">${escapeHtml(sub)}</div></div>` +
@@ -1047,7 +1054,7 @@ async function openChannel(ch, name) {
   inp.placeholder = ch === "crew" ? "Message the crew…" : `Private to ${dispName}…`;
   renderChannelTabs();
   setTimeout(() => { listEl.scrollTop = listEl.scrollHeight; }, 30);
-  document.getElementById("chatTitle").textContent = ch === "crew" ? "💬 Crew Chat" : "🔒 Private · " + dispName;
+  document.getElementById("chatTitle").textContent = ch === "crew" ? "Crew Chat" : "DM · " + dispName;
 }
 function renderChannelTabs() {
   const wrap = document.getElementById("chTabs");
@@ -1209,6 +1216,26 @@ hideBtn.addEventListener("click", () => {
   hideBtn.classList.toggle("ghost", !visible);
   upsertMe();
 });
+
+function toggleSatellite() {
+  isSatellite = !isSatellite;
+  if (isSatellite) { map.removeLayer(curBase); curSat.addTo(map); }
+  else { map.removeLayer(curSat); curBase.addTo(map); }
+  document.getElementById("satBtn").classList.toggle("active", isSatellite);
+}
+function locateMe() {
+  const m = friendMarkers[USER_ID];
+  if (m) { map.setView(m.getLatLng(), 16); return; }
+  if (lastPos) { map.setView([lastPos.lat, lastPos.lng], 16); return; }
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      p => map.setView([p.coords.latitude, p.coords.longitude], 16),
+      () => toast("📍 Location not available")
+    );
+  }
+}
+document.getElementById("locateBtn").addEventListener("click", locateMe);
+document.getElementById("satBtn").addEventListener("click", toggleSatellite);
 
 // Auf dem Handy nur in der installierten Home-App registrieren (sonst Doppel-Accounts:
 // Safari-Tab und Home-App haben getrennte Speicher). Im Safari-Tab → Installations-Anleitung.
